@@ -20,7 +20,7 @@ ul.meniu {
     justify-content: center; gap: 1.5rem; align-items: center;
 }
 
-/* Scoatem pătrățelele de la elementele de listă din meniu */
+/* Scoatem patratelele de la elementele de lista din meniu */
 ul.meniu li {
     list-style: none;
 }
