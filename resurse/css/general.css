@@ -1,4 +1,4 @@
-/* --- 2. VARIABILE CSS ÎN BODY (SCHEMA CROMATICĂ) --- */
+/* --- 2. VARIABILE CSS IN BODY  --- */
 body {
     --culoare-principala: #0B3D91;
     --culoare-secundara: #2f80ed;
@@ -23,7 +23,7 @@ body {
     --culoare-math-verde: #2e7d32;
     --culoare-math-rosu: #d32f2f;
 
-    /* Variabile pentru spațieri și padding */
+    /* Variabile pentru spatieri si padding */
     --spatiere-pagina: 6vw;
     --gap-grid: 1.8rem;
     --padding-zone: 1.5rem;
@@ -37,7 +37,7 @@ body {
     line-height: 1.6;
 }
 
-/* --- 3. STILIZĂRI TIPOGRAFICE RELATIVE --- */
+/* --- 3. STILIZARI TIPOGRAFICE RELATIVE --- */
 h1, h2, h3 { color: var(--culoare-principala); margin-top: 0; }
 a { color: var(--culoare-secundara); text-decoration: none; transition: color 0.3s; }
 a:hover { color: var(--culoare-accent); }
@@ -47,7 +47,7 @@ em, i { font-style: italic; color: var(--culoare-accent); }
 ul, ol { margin-left: 1.5rem; padding-bottom: 1rem; }
 li { list-style-type: square; margin-bottom: 0.5rem; }
 
-/* --- 4. GRID LAYOUT & IZOLARE VIZUALĂ --- */
+/* --- 4. GRID LAYOUT & IZOLARE VIZUALA --- */
 #grid-pagina {
     display: grid;
     grid-template-columns: repeat(4, 1fr); 
@@ -283,27 +283,27 @@ img, video, iframe, object {
     font-size: 1.1rem;
 }
 
-/* Stilizare pentru secțiunea cu poza interactivă de la final */
+/* Stilizare pentru sectiunea cu poza interactiva de la final */
 #zone-echipament {
     text-align: center;
     margin-top: 3rem;
 }
 
 #zone-echipament img {
-    /* Scoatem padding-ul și border-ul ca să nu decalăm coordonatele hărții */
+    /* Scoatem padding-ul si border-ul ca sa nu decalam coordonatele hartii */
     padding: 0;
     border: none;
     background-color: transparent;
     
-    /* Asigurăm că imaginea se centrează corect fără să distorsioneze harta */
+    /* Asiguram ca imaginea se centrează corect fara sa distorsioneze harta */
     display: block;
     margin: 0 auto;
     width: 100%;
-    max-width: 1280px; /* Lățimea maximă a hărții tale celei mai mari */
+    max-width: 1280px; /* Latimea maxima a hartii tale celei mai mari */
 }
 
 /* ==========================================================================
-   STILIZARE SUBSOL (FOOTER) - ASPECT DE REVISTĂ (ÎN TON CU SITE-UL)
+   STILIZARE SUBSOL (FOOTER) - ASPECT DE REVISTA (TON CU SITE-UL)
    ========================================================================== */
 footer {
     /* Folosim gradientul din header pentru a unifica designul paginii */
@@ -355,13 +355,13 @@ footer {
 }
 
 .footer-contact a {
-    color: var(--culoare-border); /* Un bleu deschis care se citește ușor */
+    color: var(--culoare-border); /* Un bleu deschis care se citeste usor */
     text-decoration: none;
     transition: color 0.3s ease, padding-left 0.3s ease;
 }
 
 .footer-contact a:hover {
-    color: var(--culoare-highlight); /* Portocaliul definit de tine */
+    color: var(--culoare-highlight); 
     padding-left: 5px; 
 }
 
@@ -405,42 +405,42 @@ footer {
 }
 
 /* ==========================================================================
-   STILIZARE RESURSE (PDF & Buton Descărcare)
+   STILIZARE RESURSE (PDF & Buton Descarcare)
    ========================================================================== */
 
 /* 1. Containerul pentru PDF */
 .pdf-wrapper {
     margin: 2rem 0;
     border-radius: 12px;
-    overflow: hidden; /* Păstrează colțurile rotunjite */
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); /* O umbră fină pentru profunzime */
+    overflow: hidden; /* Pastreaza colturile rotunjite */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); /* O umbra fina pentru profunzime */
     border: 2px solid var(--culoare-border);
     background-color: var(--culoare-alb);
 }
 
-/* 2. Suprascriem înălțimea strivită a documentului */
+/* 2. Suprascriem inaltimea strivita a documentului */
 .pdf-wrapper object {
     width: 100%;
-    height: 600px !important; /* Forțăm o înălțime generoasă, de 600px */
+    height: 600px !important; /* Fortam o inaltime generoasa, de 600px */
     display: block;
     border: none;
 }
 
-/* 3. Containerul pentru butonul de descărcare */
+/* 3. Containerul pentru butonul de descarcare */
 .download-container {
-    text-align: center; /* Centrăm butonul frumos sub PDF */
+    text-align: center; /* Centram butonul frumos sub PDF */
     margin-bottom: 2rem;
 }
 
-/* 4. Stilizarea butonului de descărcare (clasa btn-modern din HTML-ul tău) */
+/* 4. Stilizarea butonului de descarcare  */
 .btn-modern {
     display: inline-flex;
     align-items: center;
-    gap: 8px; /* Spațiu între iconiță și text */
-    background-color: var(--culoare-accent); /* Folosim portocaliul pentru a atrage atenția */
-    color: var(--culoare-alb) !important; /* Forțăm textul alb ca să nu fie albastru ca linkurile normale */
+    gap: 8px; /* Spatiu intre iconita si text */
+    background-color: var(--culoare-accent); /* Folosim portocaliul pentru a atrage atentia */
+    color: var(--culoare-alb) !important; /* Fortam textul alb ca sa nu fie albastru ca linkurile normale */
     padding: 0.8rem 1.8rem;
-    border-radius: 30px; /* Formă de pilulă, foarte modernă */
+    border-radius: 30px; /* Forma de pilula, foarte moderna */
     font-weight: bold;
     text-decoration: none;
     box-shadow: 0 4px 10px rgba(242, 106, 61, 0.3);
@@ -450,13 +450,13 @@ footer {
 /* 5. Efectul la trecerea cu mouse-ul peste buton */
 .btn-modern:hover {
     background-color: var(--culoare-highlight);
-    transform: translateY(-3px); /* Butonul se ridică ușor */
+    transform: translateY(-3px); /* Butonul se ridica usor */
     box-shadow: 0 8px 15px rgba(242, 106, 61, 0.4);
 }
 
 /* --- RESPONSIVITATE PENTRU ECRANE MICI --- */
 @media screen and (max-width: 700px) {
     .pdf-wrapper object {
-        height: 450px !important; /* Îl facem puțin mai mic pe telefon ca să nu ocupe tot ecranul */
+        height: 450px !important; /* Il facem putin mai mic pe telefon ca sa nu ocupe tot ecranul */
     }
 }
