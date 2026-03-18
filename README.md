@@ -3,7 +3,7 @@
 **Autor:** Drăghiciu Alexandru Gabriel  
 **Program:** CTI – Grupa 262  
 **Curs:** Tehnici Web  
-**Stadiul proiectului:** Etapa 0  
+**Stadiul proiectului:** Etapa 2  
 
 ---
 
