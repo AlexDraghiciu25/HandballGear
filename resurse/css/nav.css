@@ -1,0 +1,73 @@
+/* --- STILIZARE MENIU PRINCIPAL (DESKTOP) - NIVEL EXPERT --- */
+
+#ch-menu,
+#hamburger,
+.imag-icon {
+    display: none !important; 
+}
+
+nav {
+    /* Acum foloseste exclusiv variabile din body */
+    background: linear-gradient(135deg, var(--culoare-principala), var(--culoare-nav-grad));
+    border-radius: 12px;
+    padding: 0.5rem 1.5rem;
+    box-shadow: 0 8px 20px rgba(11, 61, 145, 0.2);
+    margin-bottom: 2rem;
+}
+
+ul.meniu {
+    list-style-type: none; margin: 0; padding: 0; display: flex;         
+    justify-content: center; gap: 1.5rem; align-items: center;
+}
+
+/* Scoatem pătrățelele de la elementele de listă din meniu */
+ul.meniu li {
+    list-style: none;
+}
+
+ul.meniu > li {
+    position: relative; border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+ul.meniu > li:hover {
+    background-color: var(--culoare-secundara);
+    box-shadow: 0 4px 12px rgba(47, 128, 237, 0.4);
+    transform: translateY(-2px); 
+}
+
+ul.meniu > li a,
+ul.meniu > li > div {
+    color: var(--culoare-alb); font-size: 1.05rem; font-weight: 600; text-decoration: none;
+    display: flex; align-items: center; justify-content: center; gap: 8px; 
+    padding: 0.8rem 1.5rem; cursor: pointer; margin: 0;
+}
+
+ul.meniu > li > div.text-icon a { padding: 0; }
+
+ul.meniu ul {
+    visibility: hidden; opacity: 0; position: absolute; top: 130%; left: 50%;
+    transform: translateX(-50%); background-color: var(--culoare-alb);
+    border: 1px solid var(--culoare-border); list-style-type: none; padding: 0.5rem 0;
+    margin: 0; min-width: 220px; border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 100; transition: all 0.3s ease;
+}
+
+ul.meniu ul::before {
+    content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%) rotate(45deg);
+    width: 12px; height: 12px; background-color: var(--culoare-alb);
+    border-left: 1px solid var(--culoare-border); border-top: 1px solid var(--culoare-border);
+}
+
+ul.meniu > li:hover > ul { visibility: visible; opacity: 1; top: 105%; }
+
+ul.meniu ul li { padding: 0; }
+
+ul.meniu ul a {
+    padding: 0.8rem 1.5rem; font-weight: 500; font-size: 0.95rem;
+    color: var(--culoare-text) !important; transition: all 0.2s ease; display: block; text-align: left;
+}
+
+ul.meniu ul a:hover {
+    background-color: var(--culoare-fundal); color: var(--culoare-principala) !important; padding-left: 2rem; 
+}
