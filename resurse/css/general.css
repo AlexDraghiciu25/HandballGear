@@ -523,3 +523,466 @@ footer { page-break-before: always !important; }
     }
 }
 
+
+/* --- 2. VARIABILE CSS IN BODY  --- */
+body {
+    --culoare-principala: #0B3D91;
+    --culoare-secundara: #2f80ed;
+    --culoare-fundal: #f5f7fb;
+    --culoare-card: #ffffff;
+    --culoare-accent: #f26a3d;
+    --culoare-text: #1f2a37;
+    --culoare-border: #d9e2ef;
+    --culoare-alb: #ffffff;
+    --culoare-highlight: #ff8a3d;
+    --culoare-footer: #9eb5e1;
+    
+    /* Variabile pentru culorile care erau hardcodate */
+    --culoare-tab-bg: #e6e8fa;
+    --culoare-tab-text: #4a4e8e;
+    --culoare-tab-hover: #7c80bb;
+    --culoare-nav-grad: #154e9e;
+    --culoare-caption: #555555;
+    --culoare-sageata-hover: #333333;
+    --culoare-sageata-active: #000000;
+    --culoare-math-mo: #333333;
+    --culoare-math-verde: #2e7d32;
+    --culoare-math-rosu: #d32f2f;
+
+    /* Variabile pentru spatieri si padding */
+    --spatiere-pagina: 6vw;
+    --gap-grid: 1.8rem;
+    --padding-zone: 1.5rem;
+
+    width: 100%;
+    min-width: 320px;
+    padding: 0 var(--spatiere-pagina); 
+    background-color: var(--culoare-fundal);
+    color: var(--culoare-text);
+    font-family: "Madimi One", Arial, sans-serif;
+    line-height: 1.6;
+}
+
+/* --- 3. STILIZARI TIPOGRAFICE RELATIVE --- */
+h1, h2, h3 { color: var(--culoare-principala); margin-top: 0; }
+a { color: var(--culoare-secundara); text-decoration: none; transition: color 0.3s; }
+a:hover { color: var(--culoare-accent); }
+
+strong, b { font-weight: 800; color: var(--culoare-principala); }
+em, i { font-style: italic; color: var(--culoare-accent); }
+ul, ol { margin-left: 1.5rem; padding-bottom: 1rem; }
+li { list-style-type: square; margin-bottom: 0.5rem; }
+
+/* --- 4. GRID LAYOUT & IZOLARE VIZUALA --- */
+#grid-pagina {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    grid-template-areas:
+        "zona1 zona1 zona1 zona1"
+        "zona8 zona8 zona8 zona8"
+        "zona3 zona2 zona2 zona4"
+        "zona5 zona6 zona7 zona7";
+    gap: var(--gap-grid); 
+    padding: 2rem 0;
+}
+
+#welcome    { grid-area: zona1; }
+#produse    { grid-area: zona8; }
+#evenimente { grid-area: zona3; }
+#orar       { grid-area: zona2; }
+#promotii   { grid-area: zona4; }
+#status     { grid-area: zona5; }
+#faq        { grid-area: zona6; }
+#resurse    { grid-area: zona7; }
+
+section, article {
+    background-color: var(--culoare-card); 
+    border: 1px solid var(--culoare-border);  
+    border-radius: 12px;                      
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);  
+    padding: var(--padding-zone); 
+}
+
+header {
+    background-color: var(--culoare-alb);
+    border-bottom: 5px solid var(--culoare-principala);
+    border-radius: 0 0 15px 15px;
+    padding: 1rem var(--padding-zone);
+    margin-bottom: 1rem;
+}
+
+footer {
+    background-color: var(--culoare-footer);
+    color: var(--culoare-alb);
+    border-radius: 15px 15px 0 0;
+    padding: var(--padding-zone);
+    margin-top: 2rem;
+}
+footer * { color: var(--culoare-alb); }
+
+/* --- 5. ELEMENTE MEDIA --- */
+img, video, iframe, object {
+    width: 100%;             
+    max-width: 100%;         
+    min-width: 250px;         
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* --- 6. TABEL (stilizare-tabel) --- */
+#orar { overflow-x: auto; }
+
+#tab-orar {
+    width: 100%;
+    min-width: 600px; 
+    border-collapse: separate; 
+    border-spacing: 2px;
+    margin-bottom: 1rem;
+}
+
+#tab-orar th {
+    padding: 1rem;
+    background-color: var(--culoare-principala);
+    color: var(--culoare-alb);
+    border: 1px solid var(--culoare-border);
+}
+
+#tab-orar td {
+    padding: 0.8rem;
+    border: 1px solid var(--culoare-border);
+    text-align: center;
+}
+
+#tab-orar caption {
+    caption-side: bottom;
+    padding: 15px 0 5px 0;
+    font-style: italic;
+    color: var(--culoare-caption);
+}
+
+#tab-orar tbody tr:nth-child(even) { background-color: var(--culoare-fundal); }
+#tab-orar tbody tr:nth-child(odd) { background-color: var(--culoare-alb); }
+#tab-orar tbody td:nth-child(even) { font-weight: bold; color: var(--culoare-principala); }
+#tab-orar tbody td:nth-child(odd) { color: var(--culoare-text); }
+
+#tab-orar tbody tr { transition: background-color 0.4s ease; }
+#tab-orar tbody tr:hover { background-color: var(--culoare-footer); }
+#tab-orar tbody tr:hover td { color: var(--culoare-alb); }
+
+/* --- 7. TAB-URI (stilizare-taburi) --- */
+.container-iframe { display: flex; align-items: stretch; margin: 2rem 0; }
+.taburi-iframe { display: flex; flex-direction: column; gap: 12px; margin-right: -3px; z-index: 2; }
+.taburi-iframe br { display: none; }
+
+.btn-tab {
+    display: flex; align-items: center; justify-content: center;
+    width: 150px; min-height: 60px; padding: 10px;
+    background-color: var(--culoare-tab-bg);      
+    color: var(--culoare-tab-text);                 
+    border: 3px solid var(--culoare-tab-text);      
+    border-radius: 10px 0 0 10px;   
+    font-weight: bold; text-align: center; text-decoration: none; line-height: 1.2;
+    transition: all 0.3s ease;
+}
+
+.btn-tab:hover {
+    background-color: var(--culoare-tab-hover); 
+    color: var(--culoare-alb);            
+    cursor: pointer;
+}
+
+.video-wrapper {
+    flex-grow: 1; border: 3px solid var(--culoare-tab-text); background-color: var(--culoare-alb); display: flex;
+}
+.video-wrapper iframe { width: 100%; min-height: 400px; border: none; }
+
+/* --- 8. MATHML --- */
+#formula math { font-size: 2rem; display: block; margin: 1rem 0; }
+#formula mi:first-child { font-weight: 900; color: var(--culoare-principala); font-family: "serif"; }
+#formula mo { color: var(--culoare-math-mo); padding: 0 0.4rem; }
+#formula mrow > mi:nth-child(3) { color: var(--culoare-accent); font-style: italic; }
+#formula msup mi { color: var(--culoare-math-verde); font-weight: bold; }
+#formula msup mn { font-size: 0.8em; color: var(--culoare-math-rosu); font-family: "Arial", sans-serif; }
+
+/* --- 9. LINK TOP --- */
+#link-top { display: block; position: fixed; bottom: 30px; right: 30px; opacity: 0.6; z-index: 9999; transition: opacity 0.4s ease; }
+#link-top:hover { opacity: 1; }
+#triunghi {
+    display: flex; justify-content: center; align-items: center; width: 60px; height: 60px;
+    background-color: var(--culoare-fundal); border: 3px solid var(--culoare-principala);
+    border-radius: 30px 30px 0 0; box-shadow: inset 0 0 15px rgba(11, 61, 145, 0.4); 
+    transform: rotate(360deg); transition: background-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+}
+#sageata {
+    color: var(--culoare-principala); font-size: 2rem; font-weight: bold; display: inline-block;
+    transform: scale(1); transition: transform 0.4s ease, color 0.4s ease;
+}
+#link-top:hover #triunghi { background-color: var(--culoare-border); }
+#link-top:hover #sageata { color: var(--culoare-sageata-hover); transform: scale(1.4); }
+#link-top:active #triunghi { background-color: var(--culoare-secundara); box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8); }
+#link-top:active #sageata { color: var(--culoare-sageata-active); transform: scale(1.7); transition: transform 0.1s ease; }
+
+/* --- 10. RESPONSIVITATE --- */
+@media screen and (max-width: 1000px) {
+    html { font-size: 16px; } /* Scris descrescut tranzitionat */
+    body { --spatiere-pagina: 3vw; --gap-grid: 1.2rem; }
+    
+    #grid-pagina {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-areas:
+            "zona1 zona1"
+            "zona8 zona8"
+            "zona2 zona2"
+            "zona3 zona4"
+            "zona5 zona6"
+            "zona7 zona7";
+    }
+
+    #grid-galerie {
+        grid-template-columns: repeat(2, 1fr); /* 2 imagini pe rând pe mediu */
+    }
+}
+
+@media screen and (max-width: 700px) {
+    html { font-size: 14px; } /* Scris minim tranzitionat */
+    body { --spatiere-pagina: 10px; --gap-grid: 1rem; --padding-zone: 1rem; }
+
+    #grid-pagina { display: block; }
+    section, article { margin-bottom: var(--gap-grid); }
+    img, video, iframe, object { min-width: 100%; }
+
+    #tab-orar { border-collapse: collapse; border-spacing: 0; }
+    
+    .container-iframe { flex-direction: column; }
+    .taburi-iframe { flex-direction: row; flex-wrap: wrap; margin-right: 0; margin-bottom: -3px; }
+    .btn-tab { border-radius: 10px 10px 0 0; width: auto; flex-grow: 1; }
+
+    * { animation: none !important; transition: none !important; }
+}
+
+/* -----------------------------*/
+/* ==========================================================================
+   STILIZARE GALERIE FOTO (#grid-galerie)
+   ========================================================================== */
+#grid-galerie {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 imagini pe rând */
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+#grid-galerie figure {
+    margin: 0;
+    background-color: var(--culoare-alb);
+    border: 1px solid var(--culoare-border);
+    border-radius: var(--raza-bordura);
+    overflow: hidden; /* Ține imaginea în interior la zoom */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#grid-galerie figure:hover {
+    transform: translateY(-5px); /* Se ridică ușor */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+#grid-galerie img {
+    width: 100%;
+    height: 250px; /* Forțăm o înălțime egală pentru toate */
+    object-fit: cover; /* Taie marginile proporțional fără să turtească poza */
+    border-radius: var(--raza-bordura) var(--raza-bordura) 0 0; /* Rotunjim doar sus */
+    transition: transform 0.4s ease;
+    margin: 0;
+}
+
+#grid-galerie figure:hover img {
+    transform: scale(1.05); /* Efect fin de zoom pe imagine */
+}
+
+#grid-galerie figcaption {
+    text-align: center;
+    padding: 1rem;
+    font-weight: bold;
+    color: var(--culoare-principala);
+    font-size: 1.1rem;
+}
+
+/* Stilizare pentru sectiunea cu poza interactiva de la final */
+#zone-echipament {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+#zone-echipament img {
+    /* Scoatem padding-ul si border-ul ca sa nu decalam coordonatele hartii */
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    
+    /* Asiguram ca imaginea se centrează corect fara sa distorsioneze harta */
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 1280px; /* Latimea maxima a hartii tale celei mai mari */
+}
+
+/* ==========================================================================
+   STILIZARE SUBSOL (FOOTER) - ASPECT DE REVISTA (TON CU SITE-UL)
+   ========================================================================== */
+footer {
+    /* Folosim gradientul din header pentru a unifica designul paginii */
+    background: linear-gradient(135deg, var(--culoare-principala), var(--culoare-nav-grad));
+    color: var(--culoare-alb);
+    border-radius: 15px 15px 0 0;
+    padding: 3rem var(--spatiere-pagina) 1.5rem;
+    margin-top: 3rem;
+    position: relative;
+    box-shadow: 0 -10px 30px rgba(11, 61, 145, 0.15); /* Umbră nuanțată pe albastru */
+}
+
+.footer-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3rem;
+    margin-bottom: 2rem;
+}
+
+/* Stilizare coloana de text */
+.footer-contact {
+    flex: 1;
+    font-style: normal;
+    text-align: left;
+}
+
+.footer-titlu {
+    color: var(--culoare-alb);
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--culoare-accent);
+    display: inline-block;
+}
+
+.footer-contact p {
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.footer-contact strong {
+    color: var(--culoare-alb);
+    font-weight: 500;
+    margin-right: 5px;
+}
+
+.footer-contact a {
+    color: var(--culoare-border); /* Un bleu deschis care se citeste usor */
+    text-decoration: none;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+}
+
+.footer-contact a:hover {
+    color: var(--culoare-highlight); 
+    padding-left: 5px; 
+}
+
+/* Stilizare harta */
+.footer-harta {
+    flex: 1;
+    max-width: 50%;
+}
+
+.footer-harta iframe {
+    width: 100%;
+    height: 320px !important;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    display: block;
+}
+
+/* Copyright / Partea de jos */
+.footer-copyright {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--culoare-border);
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+}
+
+/* --- RESPONSIVITATE PENTRU SUBSOL PE MOBIL --- */
+@media screen and (max-width: 1000px) {
+    .footer-layout {
+        flex-direction: column;
+        text-align: center;
+        gap: 2rem;
+    }
+
+    .footer-harta {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+/* ==========================================================================
+   STILIZARE RESURSE (PDF & Buton Descarcare)
+   ========================================================================== */
+
+/* 1. Containerul pentru PDF */
+.pdf-wrapper {
+    margin: 2rem 0;
+    border-radius: 12px;
+    overflow: hidden; /* Pastreaza colturile rotunjite */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); /* O umbra fina pentru profunzime */
+    border: 2px solid var(--culoare-border);
+    background-color: var(--culoare-alb);
+}
+
+/* 2. Suprascriem inaltimea strivita a documentului */
+.pdf-wrapper object {
+    width: 100%;
+    height: 600px !important; /* Fortam o inaltime generoasa, de 600px */
+    display: block;
+    border: none;
+}
+
+/* 3. Containerul pentru butonul de descarcare */
+.download-container {
+    text-align: center; /* Centram butonul frumos sub PDF */
+    margin-bottom: 2rem;
+}
+
+/* 4. Stilizarea butonului de descarcare  */
+.btn-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Spatiu intre iconita si text */
+    background-color: var(--culoare-accent); /* Folosim portocaliul pentru a atrage atentia */
+    color: var(--culoare-alb) !important; /* Fortam textul alb ca sa nu fie albastru ca linkurile normale */
+    padding: 0.8rem 1.8rem;
+    border-radius: 30px; /* Forma de pilula, foarte moderna */
+    font-weight: bold;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(242, 106, 61, 0.3);
+    transition: all 0.3s ease;
+}
+
+/* 5. Efectul la trecerea cu mouse-ul peste buton */
+.btn-modern:hover {
+    background-color: var(--culoare-highlight);
+    transform: translateY(-3px); /* Butonul se ridica usor */
+    box-shadow: 0 8px 15px rgba(242, 106, 61, 0.4);
+}
+
+/* --- RESPONSIVITATE PENTRU ECRANE MICI --- */
+@media screen and (max-width: 700px) {
+    .pdf-wrapper object {
+        height: 450px !important; /* Il facem putin mai mic pe telefon ca sa nu ocupe tot ecranul */
+    }
+}
