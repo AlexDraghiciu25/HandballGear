@@ -1,0 +1,287 @@
+@charset "UTF-8";
+body {
+  --nav-bg-start: #0B3D91;
+  --nav-bg-end: #06214d;
+  --nav-border-accent: #f26a3d;
+  --nav-text: #ffffff;
+  --nav-hover-glow: rgba(255, 255, 255, 0.12);
+  --nav-hover-shadow: rgba(47, 128, 237, 0.55);
+  --nav-accent-hover: #ff8a3d;
+  --submeniu-bg: #082b66;
+  --submeniu-border: #f26a3d;
+  --submeniu-shadow: rgba(0,0,0,0.55);
+  --submeniu-link-hover: rgba(255,255,255,0.06);
+  --hamburger-bg: #06214d;
+  --hamburger-hover-glow: rgba(255, 255, 255, 0.15);
+  --inalt-nav-desktop: 110px;
+}
+
+nav ul.meniu > li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: var(--inalt-nav-desktop);
+  padding: 0 1.6rem;
+  cursor: pointer;
+  transition: background-color 0.35s ease, box-shadow 0.35s ease;
+}
+nav ul.meniu > li:hover {
+  box-shadow: inset 0 20px 30px -10px var(--nav-hover-shadow), inset 0 -20px 30px -10px var(--nav-hover-shadow);
+}
+nav ul.meniu > li:hover .nav-icon, nav ul.meniu > li:hover .nav-text a, nav ul.meniu > li:hover .imag-icon, nav ul.meniu > li:hover .text-icon a, nav ul.meniu > li:hover > a {
+  color: var(--nav-accent-hover) !important;
+}
+
+nav ul, nav li {
+  list-style: none !important;
+  margin: 0;
+  padding: 0;
+}
+
+nav {
+  background: linear-gradient(135deg, var(--nav-bg-start), var(--nav-bg-end));
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1000;
+}
+nav #ch-menu {
+  display: none !important;
+}
+nav label#hamburger {
+  display: none;
+}
+nav ul.meniu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+nav ul.meniu > li {
+  position: relative;
+}
+nav ul.meniu > li .nav-icon, nav ul.meniu > li .imag-icon {
+  font-size: 1.5rem;
+  color: var(--nav-text);
+  display: block;
+  margin-bottom: 4px;
+  transition: color 0.35s ease;
+}
+nav ul.meniu > li .nav-text a, nav ul.meniu > li .text-icon a, nav ul.meniu > li > a {
+  color: var(--nav-text);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.35s ease;
+}
+nav ul.meniu > li ul {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: top center;
+  background-color: var(--submeniu-bg);
+  min-width: 200px;
+  border-top: 2px solid var(--submeniu-border);
+  box-shadow: 0 16px 32px var(--submeniu-shadow);
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: block !important;
+}
+nav ul.meniu > li ul li a {
+  display: block;
+  padding: 1rem 1.5rem 1rem 2.5rem;
+  color: var(--nav-text) !important;
+  text-decoration: none;
+  font-size: 0.95rem;
+  position: relative;
+  transition: padding-left 0.3s ease, background-color 0.3s ease;
+}
+nav ul.meniu > li ul li a::before {
+  content: "→";
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  color: var(--nav-text);
+  transition: left 0.45s ease-out, opacity 0.45s ease-out;
+}
+nav ul.meniu > li ul li a:hover {
+  background-color: var(--submeniu-link-hover);
+  padding-left: 3rem;
+}
+nav ul.meniu > li ul li a:hover::before {
+  left: 1rem;
+  opacity: 1;
+}
+nav ul.meniu > li:hover > ul {
+  transform: translateX(-50%) scaleY(1);
+}
+
+@media screen and (max-width: 1000px) and (min-width: 701px) {
+  nav ul.meniu > li {
+    height: 70px;
+    padding: 0 1.5rem;
+  }
+  nav ul.meniu > li .nav-text, nav ul.meniu > li .text-icon {
+    display: none !important;
+  }
+  nav ul.meniu > li .imag-icon {
+    display: block !important;
+    font-size: 1.8rem !important;
+    margin-bottom: 0 !important;
+  }
+  nav ul.meniu > li > a {
+    font-size: 0;
+  }
+  nav ul.meniu > li > a i {
+    font-size: 1.8rem !important;
+  }
+}
+@keyframes animatieIntrareBara {
+  0% {
+    opacity: 0;
+    transform: translateX(-40px) rotate(-90deg) scale(0.5);
+    background-color: var(--nav-border-accent);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateX(10px) rotate(15deg) scale(1.1);
+    background-color: var(--nav-text);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+    background-color: var(--nav-text);
+  }
+}
+@keyframes scalareDinStangaSus {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@media screen and (max-width: 700px) {
+  nav {
+    background: linear-gradient(135deg, var(--nav-bg-start), var(--nav-bg-end)) !important;
+    border-radius: 0;
+  }
+  nav label#hamburger {
+    display: block !important;
+    position: relative;
+    width: 35px;
+    height: 24px;
+    margin: 15px 20px;
+    cursor: pointer;
+  }
+  nav label#hamburger .bara {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--nav-text);
+    border-radius: 2px;
+    opacity: 0;
+  }
+  nav label#hamburger .bara.bara-1 {
+    top: 0;
+  }
+  nav label#hamburger .bara.bara-2 {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  nav label#hamburger .bara.bara-3 {
+    bottom: 0;
+  }
+  nav label#hamburger .bara {
+    animation: animatieIntrareBara 0.6s ease-out forwards;
+  }
+  nav label#hamburger .bara-1 {
+    animation-delay: 200ms;
+  }
+  nav label#hamburger .bara-2 {
+    animation-delay: 400ms;
+  }
+  nav label#hamburger .bara-3 {
+    animation-delay: 600ms;
+  }
+  nav ul.meniu {
+    display: none;
+    flex-direction: column;
+    background: linear-gradient(135deg, var(--nav-bg-start), var(--nav-bg-end));
+    border-bottom: 4px solid var(--nav-border-accent);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transform-origin: top left;
+  }
+  #ch-menu:checked ~ ul.meniu {
+    display: flex !important;
+    animation: scalareDinStangaSus 0.4s ease-out forwards;
+  }
+  nav ul.meniu > li {
+    height: auto !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  nav ul.meniu > li:first-child .text-icon {
+    display: none !important;
+  }
+  nav ul.meniu > li:first-child .imag-icon {
+    display: block !important;
+    font-size: 1.8rem;
+    padding: 1rem;
+  }
+  nav ul.meniu > li:not(:first-child) .imag-icon {
+    display: none !important;
+  }
+  nav ul.meniu > li:not(:first-child) .text-icon a, nav ul.meniu > li:not(:first-child) > a {
+    display: block !important;
+    font-size: 1.2rem;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  nav ul.meniu > li:hover {
+    box-shadow: inset 0 0 30px var(--hamburger-hover-glow) !important;
+  }
+  nav ul.meniu > li:hover a::before {
+    display: none !important;
+  }
+  nav ul.meniu > li ul {
+    display: none !important;
+    position: static !important;
+    transform: none !important;
+    width: 100%;
+    border: none;
+    background: rgba(0, 0, 0, 0.15) !important;
+  }
+  nav ul.meniu > li ul li a {
+    text-align: center;
+    padding: 1rem !important;
+  }
+  nav ul.meniu > li ul li a::before {
+    display: none !important;
+  }
+  nav ul.meniu > li ul li a:hover {
+    box-shadow: inset 0 0 30px var(--hamburger-hover-glow);
+    padding-left: 1rem !important;
+  }
+  nav ul.meniu > li:hover > ul, nav ul.meniu > li:focus-within > ul, nav ul.meniu > li:active > ul {
+    display: block !important;
+  }
+}/*# sourceMappingURL=nav1.css.map */

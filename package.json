@@ -1,0 +1,24 @@
+{
+  "name": "handballgear",
+  "version": "1.0.0",
+  "description": "handballgear online",
+  "keywords": [
+    "handbal",
+    "minge",
+    "adidasi",
+    "echipament",
+    "cotiere",
+    "genunchere"
+  ],
+  "license": "ISC",
+  "author": "Draghiciu Alexandru Gabriel",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "ejs": "^5.0.1",
+    "express": "^5.2.1"
+  }
+}

@@ -1,0 +1,210 @@
+// ============================================================
+// VARIABILE SASS – valori repetitive de layout/animație
+// ============================================================
+$tranzitie-viteza:   0.35s;
+$tranzitie-submeniu: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+$tranzitie-sageata:  0.45s ease-out;
+$breakpoint-mediu:   1000px;
+$breakpoint-mic:     700px;
+$z-nav:              1000;
+
+// ============================================================
+// VARIABILE CSS (în body – pt. temă cromatică)
+// ============================================================
+body {
+  --nav-bg-start:        #0B3D91; // Albastrul tău principal
+  --nav-bg-end:          #06214d; // Un albastru mai închis pentru gradient
+  --nav-border-accent:   #f26a3d; // Portocaliul accent
+  --nav-text:            #ffffff;
+  --nav-hover-glow:      rgba(255, 255, 255, 0.12); 
+  --nav-hover-shadow:    rgba(47, 128, 237, 0.55); 
+  --nav-accent-hover:    #ff8a3d;
+  --submeniu-bg:         #082b66;
+  --submeniu-border:     #f26a3d;
+  --submeniu-shadow:     rgba(0,0,0,0.55);
+  --submeniu-link-hover: rgba(255,255,255,0.06);
+  
+  // Am înlocuit negrul cu albastru închis pentru mobil
+  --hamburger-bg:        #06214d; 
+  --hamburger-hover-glow: rgba(255, 255, 255, 0.15);
+  --inalt-nav-desktop:   110px;
+}
+
+// ============================================================
+// @extend – placeholder comun pentru butonul de meniu principal
+// ============================================================
+%buton-nav-comun {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: var(--inalt-nav-desktop);
+  padding: 0 1.6rem;
+  cursor: pointer;
+  transition: background-color $tranzitie-viteza ease, box-shadow $tranzitie-viteza ease;
+
+  &:hover {
+    box-shadow: inset 0 20px 30px -10px var(--nav-hover-shadow), 
+                inset 0 -20px 30px -10px var(--nav-hover-shadow);
+    .nav-icon, .nav-text a, .imag-icon, .text-icon a, > a {
+      color: var(--nav-accent-hover) !important;
+    }
+  }
+}
+
+nav ul, nav li { list-style: none !important; margin: 0; padding: 0; }
+
+// ============================================================
+// NAV – Ecran Mare
+// ============================================================
+nav {
+  background: linear-gradient(135deg, var(--nav-bg-start), var(--nav-bg-end));
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: $z-nav;
+
+  #ch-menu { display: none !important; }
+  label#hamburger { display: none; }
+
+  ul.meniu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+
+    > li {
+      @extend %buton-nav-comun; 
+      position: relative;
+
+      .nav-icon, .imag-icon {
+        font-size: 1.5rem; color: var(--nav-text); display: block; margin-bottom: 4px; transition: color $tranzitie-viteza ease;
+      }
+      .nav-text a, .text-icon a, > a {
+        color: var(--nav-text); text-decoration: none; font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: 8px; transition: color $tranzitie-viteza ease;
+      }
+
+      ul {
+        position: absolute;
+        top: 100%; left: 50%; transform: translateX(-50%) scaleY(0); transform-origin: top center;
+        background-color: var(--submeniu-bg); min-width: 200px; border-top: 2px solid var(--submeniu-border); box-shadow: 0 16px 32px var(--submeniu-shadow); overflow: hidden; transition: transform $tranzitie-submeniu; display: block !important;
+
+        li a {
+          display: block; padding: 1rem 1.5rem 1rem 2.5rem; color: var(--nav-text) !important; text-decoration: none; font-size: 0.95rem; position: relative; transition: padding-left 0.3s ease, background-color 0.3s ease;
+          
+          &::before { 
+            content: '→'; 
+            position: absolute; left: -20px; top: 50%; transform: translateY(-50%); opacity: 0; color: var(--nav-text); transition: left $tranzitie-sageata, opacity $tranzitie-sageata; 
+          }
+          &:hover { background-color: var(--submeniu-link-hover); padding-left: 3rem; &::before { left: 1rem; opacity: 1; } }
+        }
+      }
+      &:hover > ul { transform: translateX(-50%) scaleY(1); }
+    }
+  }
+}
+
+// ============================================================
+// ECRAN MEDIU
+// ============================================================
+@media screen and (max-width: $breakpoint-mediu) and (min-width: ($breakpoint-mic + 1px)) {
+  nav ul.meniu > li {
+    height: 70px; padding: 0 1.5rem;
+    .nav-text, .text-icon { display: none !important; }
+    .imag-icon { display: block !important; font-size: 1.8rem !important; margin-bottom: 0 !important; }
+    > a { font-size: 0; i { font-size: 1.8rem !important; } }
+  }
+}
+
+// ============================================================
+// ECRAN MIC (Mobil) 
+// ============================================================
+
+@keyframes animatieIntrareBara {
+  0% { opacity: 0; transform: translateX(-40px) rotate(-90deg) scale(0.5); background-color: var(--nav-border-accent); }
+  50% { opacity: 0.6; transform: translateX(10px) rotate(15deg) scale(1.1); background-color: var(--nav-text); }
+  100% { opacity: 1; transform: translateX(0) rotate(0deg) scale(1); background-color: var(--nav-text); }
+}
+
+@keyframes scalareDinStangaSus {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media screen and (max-width: $breakpoint-mic) {
+  nav {
+    // Acum folosim gradientul și pe bara de sus a hamburgerului
+    background: linear-gradient(135deg, var(--nav-bg-start), var(--nav-bg-end)) !important;
+    border-radius: 0;
+    
+    label#hamburger {
+      display: block !important;
+      position: relative; width: 35px; height: 24px; margin: 15px 20px; cursor: pointer;
+
+      .bara {
+        position: absolute; left: 0; width: 100%; height: 4px; background: var(--nav-text); border-radius: 2px; opacity: 0; 
+        &.bara-1 { top: 0; } &.bara-2 { top: 50%; transform: translateY(-50%); } &.bara-3 { bottom: 0; }
+        animation: animatieIntrareBara 0.6s ease-out forwards;
+      }
+      @for $i from 1 through 3 { .bara-#{$i} { animation-delay: #{$i * 200}ms; } }
+    }
+
+    ul.meniu {
+      display: none; 
+      flex-direction: column;
+      
+      // Am pus gradientul tău superb și pe meniul extins + o dungă portocalie jos
+      background: linear-gradient(135deg, var(--nav-bg-start), var(--nav-bg-end));
+      border-bottom: 4px solid var(--nav-border-accent);
+      
+      position: absolute;
+      top: 100%; 
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      transform-origin: top left; 
+    }
+  }
+
+  #ch-menu:checked ~ ul.meniu {
+    display: flex !important;
+    animation: scalareDinStangaSus 0.4s ease-out forwards;
+  }
+
+  nav ul.meniu > li {
+    height: auto !important; padding: 0 !important; background: transparent !important; box-shadow: none !important;
+
+    &:first-child {
+      .text-icon { display: none !important; }
+      .imag-icon { display: block !important; font-size: 1.8rem; padding: 1rem; }
+    }
+
+    &:not(:first-child) {
+      .imag-icon { display: none !important; }
+      .text-icon a, > a { display: block !important; font-size: 1.2rem; padding: 1.2rem; text-align: center; }
+    }
+
+    &:hover {
+      box-shadow: inset 0 0 30px var(--hamburger-hover-glow) !important;
+      a::before { display: none !important; } 
+    }
+
+    ul {
+      display: none !important; position: static !important; transform: none !important; width: 100%; border: none;
+      
+      // Aici am pus un fundal ușor transparent ca să se separe frumos opțiunile
+      background: rgba(0, 0, 0, 0.15) !important;
+      
+      li a {
+        text-align: center; padding: 1rem !important;
+        &::before { display: none !important; } 
+        &:hover { box-shadow: inset 0 0 30px var(--hamburger-hover-glow); padding-left: 1rem !important; }
+      }
+    }
+
+    &:hover > ul, &:focus-within > ul, &:active > ul { display: block !important; }
+  }
+}
