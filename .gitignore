@@ -1,0 +1,8 @@
+# Module Node
+node_modules/
+
+# Foldere generate de aplicatie (Task 20)
+temp/
+logs/
+backup/
+fisiere_uploadate/

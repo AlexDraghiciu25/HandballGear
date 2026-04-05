@@ -1011,3 +1011,64 @@ footer {
     color: #c0392b; /* O nuanță de roșu/închisă pentru cuvântul italic */
     font-style: italic;
 }
+
+/* ========================================== */
+/* STILIZARE LINKURI (Task)                   */
+/* ========================================== */
+
+/* Definim culorile in variabile (daca nu le ai deja definite in :root) */
+:root {
+    --culoare-vizitat: #8e44ad; /* Un mov pentru linkurile vizitate */
+    --c1: rgba(52, 152, 219, 0.4); /* Un albastru semi-transparent pt pata de culoare */
+    --culoare-simbol: #e74c3c; /* Culoare rosiatica pt simbolul extern la hover */
+    --culoare-border-click: #2980b9; /* Culoare border la click */
+}
+
+/* 1. Linkuri vizitate (Culoare diferită) */
+a:visited {
+    color: var(--culoare-vizitat);
+}
+
+/* 2. Linkuri EXTERNE (care incep cu http) */
+a[href^="http"]::before {
+    content: "⮳ "; /* Simbolul cerut */
+    font-size: 1.5em; /* 50% mai mare folosind unitate relativa */
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+/* Schimbarea culorii simbolului la hover */
+a[href^="http"]:hover::before {
+    color: var(--culoare-simbol);
+}
+
+/* 3. Linkuri din INTERIORUL PAGINII (doar din <main>, excludem meniul) */
+main a {
+    position: relative;
+    display: inline-block; /* Ajuta la pastrarea formei patului de culoare */
+    padding: 0.1em 0.3em; /* Puțin spațiu ca pata să acopere frumos textul */
+    text-decoration: none; /* Optional: scoate liniuta jos ca efectul sa fie curat */
+    
+    /* Setarea imaginii de background conform cerintei */
+    background-image: radial-gradient(circle, var(--c1) 0%, var(--c1) 40%, transparent 80%, transparent 100%);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 0%; /* Dimensiune 0 initial */
+    
+    /* Prevenim "saritura" textului la aparitia border-ului punand unul transparent */
+    border: 2px solid transparent; 
+    border-radius: 5px; /* Face border-ul mai modern la click */
+    
+    /* Tranzitie de jumatate de secunda pe background-size */
+    transition: background-size 0.4s ease-out;
+}
+
+/* Cresterea petei de culoare la aducerea cursorului */
+main a:hover {
+    background-size: 100%; /* Pata de culoare creste la 100% */
+}
+
+/* 4. Aparitia unui border la CLICK pe link (:active) */
+main a:active {
+    border: 2px solid var(--culoare-border-click);
+}
