@@ -11,21 +11,21 @@
             "status": true,
             "titlu": "404 - Nu am găsit pagina!",
             "text": "Pagina pe care o cauți nu există pe acest server.",
-            "imagine": "lupa.png"
+            "imagine": "eroare404.png"
         },
         {
             "identificator": 403,
             "status": true,
             "titlu": "403 - Acces Interzis",
             "text": "Nu ai permisiunea de a vizualiza acest director.",
-            "imagine": "interzis.png"
+            "imagine": "eroare403.png"
         },
         {
             "identificator": 400,
             "status": true,
             "titlu": "400 - Bad Request",
             "text": "Cerere incorectă! Fișierele EJS nu pot fi accesate direct.",
-            "imagine": "interzis.png"
+            "imagine": "eroare400.png"
         }
     ]
 }
