@@ -759,7 +759,7 @@ img, video, iframe, object {
     .taburi-iframe { flex-direction: row; flex-wrap: wrap; margin-right: 0; margin-bottom: -3px; }
     .btn-tab { border-radius: 10px 10px 0 0; width: auto; flex-grow: 1; }
 
-    * { animation: none !important; transition: none !important; }
+    /* * { animation: none !important; transition: none !important; } */
 }
 
 /* -----------------------------*/

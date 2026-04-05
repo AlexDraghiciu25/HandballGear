@@ -207,4 +207,8 @@ nav {
 
     &:hover > ul, &:focus-within > ul, &:active > ul { display: block !important; }
   }
+
+  .ip-ascuns-mobil {
+    display: none !important;
+  }
 }

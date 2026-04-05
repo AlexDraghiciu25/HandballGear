@@ -20,5 +20,13 @@
   "dependencies": {
     "ejs": "^5.0.1",
     "express": "^5.2.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexDraghiciu25/HandballGear.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AlexDraghiciu25/HandballGear/issues"
+  },
+  "homepage": "https://github.com/AlexDraghiciu25/HandballGear#readme"
 }

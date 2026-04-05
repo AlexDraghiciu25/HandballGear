@@ -284,4 +284,7 @@ nav ul.meniu > li:hover > ul {
   nav ul.meniu > li:hover > ul, nav ul.meniu > li:focus-within > ul, nav ul.meniu > li:active > ul {
     display: block !important;
   }
+  .ip-ascuns-mobil {
+    display: none !important;
+  }
 }/*# sourceMappingURL=nav1.css.map */
