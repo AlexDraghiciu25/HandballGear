@@ -1,87 +1,111 @@
-const express = require("express");
-const path = require("path");
-const fs = require("fs");
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
+const PORT = 8080;
 
-// 1. Configurare motor de randare EJS
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+// --- 1. CONFIGURĂRI GENERALE ---
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// 2. Definire folder resurse statice
-app.use("/resurse", express.static(path.join(__dirname, "resurse")));
+// Definire folder resurse ca static
+app.use('/resurse', express.static(path.join(__dirname, 'resurse')));
 
-// 3. Variabila globala pentru erori
-let obGlobal = {
+// Variabila globala pentru erori (Cerinta)
+global.obGlobal = {
     obErori: null
 };
 
-// Funcție pentru inițializarea erorilor din JSON
-// Funcție pentru inițializarea erorilor din JSON
+// --- 2. INITIALIZARE ERORI (Cerinta: initErori) ---
 function initErori() {
-    // AM MODIFICAT CALEA AICI:
-    const rawData = fs.readFileSync(path.join(__dirname, "resurse", "json", "erori.json"));
-    obGlobal.obErori = JSON.parse(rawData);
-    
-    // Setăm căile absolute pentru imagini
-    if (obGlobal.obErori && obGlobal.obErori.info_erori) {
-        obGlobal.obErori.info_erori.forEach(err => {
-            err.imagine = path.join(obGlobal.obErori.cale_baza, err.imagine);
+    const caleJson = path.join(__dirname, 'resurse/json/erori.json');
+    try {
+        const continut = fs.readFileSync(caleJson, 'utf8');
+        let dateErori = JSON.parse(continut);
+        
+        // Setăm căile absolute pentru imagini folosind cale_baza
+        dateErori.info_erori.forEach(eroare => {
+            eroare.imagine = path.join('/', dateErori.cale_baza, eroare.imagine).replace(/\\/g, "/");
         });
+        dateErori.eroare_default.imagine = path.join('/', dateErori.cale_baza, dateErori.eroare_default.imagine).replace(/\\/g, "/");
+        
+        global.obGlobal.obErori = dateErori;
+    } catch (e) {
+        console.error("Eroare la citirea fisierului erori.json:", e);
     }
 }
 initErori();
 
-// Funcția de afișare a erorilor
+// --- 3. FUNCTIE AFISARE EROARE (Cerinta: afisareEroare) ---
 function afisareEroare(res, identificator, titlu, text, imagine) {
-    let eroare = obGlobal.obErori.info_erori.find(e => e.identificator == identificator);
-    if (!eroare) eroare = obGlobal.obErori.eroare_default;
+    let ed = global.obGlobal.obErori.eroare_default;
+    let eroareGasita = global.obGlobal.obErori.info_erori.find(e => e.identificator == identificator);
 
-    const deAfisat = {
-        titlu: titlu || eroare.titlu,
-        text: text || eroare.text,
-        imagine: imagine || eroare.imagine
-    };
+    // Prioritate: Argument funcție > Date JSON > Date Default
+    let resTitlu = titlu || (eroareGasita ? eroareGasita.titlu : ed.titlu);
+    let resText = text || (eroareGasita ? eroareGasita.text : ed.text);
+    let resImagine = imagine || (eroareGasita ? eroareGasita.imagine : ed.imagine);
 
-    const status = eroare.status ? identificator : 200;
-    res.status(status).render("pages/eroare", deAfisat);
+    let statusCod = (eroareGasita && eroareGasita.status) ? parseInt(identificator) : 200;
+    if(isNaN(statusCod)) statusCod = 500;
+
+    res.status(statusCod).render('pages/eroare', {
+        titlu: resTitlu,
+        text: resText,
+        imagine: resImagine
+    });
 }
 
-// 4. Securitate: Interzicere acces folder resurse fără fișier (403)
-app.use("/resurse", (req, res, next) => {
-    // Verificăm dacă url-ul original are o extensie de fișier. Dacă nu are (ex: /resurse/css/), dăm 403.
-    if (!path.extname(req.originalUrl)) {
-        return afisareEroare(res, 403);
+// --- 4. CREARE AUTOMATA FOLDERE (Cerinta: vect_foldere) ---
+const vect_foldere = ["temp", "logs", "backup", "fisiere_uploadate"];
+vect_foldere.forEach(f => {
+    let cale = path.join(__dirname, f);
+    if (!fs.existsSync(cale)) {
+        fs.mkdirSync(cale);
     }
-    next();
 });
 
-// 5. Securitate: Interzicere acces direct la .ejs (400)
-// Folosim un RegExp care se aplică oricărui link ce se termină în ".ejs"
-app.get(/\.ejs$/, (req, res) => {
-    afisareEroare(res, 400);
-});
+// --- 5. RUTE ---
 
-// 6. Rute pentru Pagina Principală
-app.get(["/", "/index", "/home"], (req, res) => {
-    res.render("pages/index", { ip: req.ip });
-});
+// Cerinta: Afisare cai
+console.log("Calea folderului (dirname):", __dirname);
+console.log("Calea fisierului (filename):", __filename);
+console.log("Folder lucru (cwd):", process.cwd());
 
-// 7. Rută pentru Favicon
+// Cerinta: Favicon
 app.get("/favicon.ico", (req, res) => {
     res.sendFile(path.join(__dirname, "resurse/imagini/favicon/favicon.ico"));
 });
 
-// 8. Rută Generală pentru pagini (trebuie să fie ultima)
-// Folosim un RegExp care capturează orice cuvânt de după "/"
-app.get(/^\/(.*)$/, (req, res) => {
-    const pagina = req.params[0];
+// Cerinta: Index cu vector de rute
+app.get(["/", "/index", "/home"], (req, res) => {
+    res.render("pages/index", { ip: req.ip });
+});
+
+// Cerinta: Eroare 400 pentru fisiere .ejs
+// Folosim RegExp pentru a evita eroarea de parametru missing
+app.get(/\/[^/]*\.ejs$/, (req, res) => {
+    afisareEroare(res, 400);
+});
+
+// Cerinta: Eroare 403 pentru directoare din resurse
+app.get(/^\/resurse\/.*\/$/, (req, res) => {
+    afisareEroare(res, 403);
+});
+
+// Cerinta: Ruta generala /* (trebuie sa fie ULTIMA)
+// Folosim paranteze capturante conform noii sintaxe Express
+// Cerinta: Ruta generala (trebuie sa fie ULTIMA)
+app.get("/:pagina", (req, res) => {
+    let pagina = req.params.pagina; // preluam numele paginii din URL
+    
     res.render("pages/" + pagina, { ip: req.ip }, function(err, rezultatRandare) {
         if (err) {
             if (err.message.startsWith("Failed to lookup view")) {
                 afisareEroare(res, 404);
             } else {
-                afisareEroare(res, 500, "Eroare Server", "A apărut o eroare la randarea paginii.");
+                afisareEroare(res, 500, "Eroare Randare", "A aparut o eroare la procesarea paginii.");
             }
         } else {
             res.send(rezultatRandare);
@@ -89,22 +113,7 @@ app.get(/^\/(.*)$/, (req, res) => {
     });
 });
 
-// 9. Creare automată foldere
-const vect_foldere = ["temp", "logs", "backup", "fisiere_uploadate"];
-vect_foldere.forEach(f => {
-    const cale = path.join(__dirname, f);
-    if (!fs.existsSync(cale)) {
-        fs.mkdirSync(cale);
-    }
-});
-
-// Afișare informații cerute în consolă
-console.log("Folder index.js:", __dirname);
-console.log("Folder curent de lucru:", process.cwd());
-console.log("Cale fișier:", __filename);
-// Răspuns la întrebare: __dirname și process.cwd() NU sunt mereu identice.
-// __dirname este locația fișierului script, process.cwd() este locația de unde ai lansat comanda 'node'.
-
-app.listen(8080, () => {
-    console.log("Serverul a pornit pe http://localhost:8080");
+// Pornire server
+app.listen(PORT, () => {
+    console.log(`Serverul a pornit pe: http://localhost:${PORT}`);
 });

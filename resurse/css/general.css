@@ -986,3 +986,28 @@ footer {
         height: 450px !important; /* Il facem putin mai mic pe telefon ca sa nu ocupe tot ecranul */
     }
 }
+
+/* Stilizare Video Prezentare */
+#video-vtt {
+    width: 80%; /* Lățime în procentaje */
+    min-width: 320px; /* Lățime minimă pentru ecrane mici */
+    max-width: 800px; /* Lățime maximă pentru ecrane mari */
+    display: block;
+    margin: 2rem auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Stilizare text subtitrări (VTT) */
+::cue {
+    background-color: rgba(255, 255, 255, 0.85); /* Fundal alb semi-transparent */
+    color: #111111; /* Text de culoare închisă */
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+/* Cuvântul italic iese mai bine în evidență */
+::cue(i) {
+    color: #c0392b; /* O nuanță de roșu/închisă pentru cuvântul italic */
+    font-style: italic;
+}
