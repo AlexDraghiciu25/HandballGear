@@ -1,0 +1,58 @@
+/* ========================================================= */
+/* 1. SUPRASCRIEREA VARIABILELOR BOOTSTRAP (Cerința ta)     */
+/* ========================================================= */
+
+// a) Familia de font implicită
+$font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+// b) Culorile de background pentru minim 2 teme (ex: primary și secondary)
+// Am ales un Portocaliu (pentru handbal) și un Albastru închis
+$primary: #ff6600; 
+$secondary: #2c3e50; 
+
+// c) Culori de font (ex: culoarea textului pe butoane / pe temele de mai sus)
+// Fortam textul de pe butoanele primary si secondary sa fie alb absolut
+$primary-text: #ffffff;
+$secondary-text: #ffffff;
+
+// d) Dimensiuni de ecran diferite pentru ecrane medii (md) și mari (lg)
+// Modificam pragurile standard (ex: de la 768px la 700px pentru md)
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 700px, // Schimbat de la 768px
+  lg: 1024px, // Schimbat de la 992px
+  xl: 1200px,
+  xxl: 1400px
+);
+
+// e) Dimensiunea razelor de border
+// Rotunjim mai mult elementele din Bootstrap
+$border-radius: 12px;
+$border-radius-lg: 20px;
+$border-radius-sm: 8px;
+
+// f) Dimensiunea literelor heading-urilor (h1, h2 etc.)
+$h1-font-size: 3rem; // Mai mare
+$h2-font-size: 2.5rem;
+$h3-font-size: 2rem;
+
+// g) Încă una sau mai multe variabile alese de voi
+// Am activat umbrele (shadows) pentru toate elementele Bootstrap care suporta si am marit spatierea
+$enable-shadows: true;
+$spacer: 1.5rem; // Mareste marginile/padding-urile standard (m-1, p-2 etc.)
+
+/* ========================================================= */
+/* 2. IMPORTUL BOOTSTRAP (Trebuie să fie DUPĂ variabile!)   */
+/* ========================================================= */
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+/* ========================================================= */
+/* 3. REGLAJE EXTRA (Daca ai nevoie sa corectezi textul de pe butoane) */
+/* ========================================================= */
+.btn-primary {
+    color: $primary-text !important;
+}
+.btn-secondary {
+    color: $secondary-text !important;
+}

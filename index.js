@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const sharp = require('sharp');
+const sass = require('sass');
 
 const app = express();
 const PORT = 8080;
@@ -14,7 +16,9 @@ app.use('/resurse', express.static(path.join(__dirname, 'resurse')));
 
 // Variabila globala pentru erori (Cerinta)
 global.obGlobal = {
-    obErori: null
+    obErori: null,
+    folderScss: path.join(__dirname, 'resurse/scss'),
+    folderCss: path.join(__dirname, 'resurse/css')
 };
 
 // --- 2. INITIALIZARE SI VERIFICARE ERORI (Task Bonus) ---
@@ -149,6 +153,92 @@ vect_foldere.forEach(f => {
     }
 });
 
+// =======================================================
+// --- COMPILARE AUTOMATĂ SCSS -> CSS (Cerinta SCSS) ---
+// =======================================================
+
+// 1. Funcția principală de compilare și backup
+function compileazaScss(caleScss, caleCss) {
+    // Dacă e cale absolută, o lăsăm așa. Dacă e relativă, o lipim de folderScss
+    let absoluteCaleScss = path.isAbsolute(caleScss) ? caleScss : path.join(global.obGlobal.folderScss, caleScss);
+    
+    let absoluteCaleCss;
+    if (!caleCss) {
+        // Dacă nu avem cale CSS, luăm numele SCSS-ului și punem extensia .css
+        let numeFisier = path.basename(absoluteCaleScss, '.scss');
+        absoluteCaleCss = path.join(global.obGlobal.folderCss, numeFisier + '.css');
+    } else {
+        absoluteCaleCss = path.isAbsolute(caleCss) ? caleCss : path.join(global.obGlobal.folderCss, caleCss);
+    }
+
+    // 2. SALVARE ÎN BACKUP
+    // Dacă fișierul CSS există deja, îi facem backup înainte să îl suprascriem
+    if (fs.existsSync(absoluteCaleCss)) {
+        try {
+            // Creăm calea backup/resurse/css
+            let folderBackup = path.join(__dirname, 'backup', 'resurse', 'css');
+            if (!fs.existsSync(folderBackup)) {
+                fs.mkdirSync(folderBackup, { recursive: true });
+            }
+            
+            let numeFisierCss = path.basename(absoluteCaleCss);
+            // Pentru a păstra istoricul, adăugăm un timestamp la numele backup-ului
+            let timestamp = new Date().getTime();
+            let numeBackup = numeFisierCss.replace('.css', `_${timestamp}.css`);
+            let caleFisierBackup = path.join(folderBackup, numeBackup);
+            
+            // Copiem CSS-ul vechi
+            fs.copyFileSync(absoluteCaleCss, caleFisierBackup);
+        } catch (err) {
+            console.error(`[EROARE BACKUP] Nu s-a putut salva backup pentru ${absoluteCaleCss}:`, err.message);
+        }
+    }
+
+    // 3. COMPILAREA PROPRIU-ZISĂ
+    try {
+        let rezultat = sass.compile(absoluteCaleScss);
+        fs.writeFileSync(absoluteCaleCss, rezultat.css);
+        console.log(`[SCSS Compilat] ${path.basename(absoluteCaleScss)} -> ${path.basename(absoluteCaleCss)}`);
+    } catch (err) {
+        console.error(`[EROARE COMPILARE SCSS] Fișier: ${caleScss}. Eroare:`, err.message);
+    }
+}
+
+// 4. COMPILARE INIȚIALĂ (La pornirea serverului)
+try {
+    if (fs.existsSync(global.obGlobal.folderScss)) {
+        let fisiereScss = fs.readdirSync(global.obGlobal.folderScss);
+        fisiereScss.forEach(fisier => {
+            if (path.extname(fisier) === '.scss') {
+                compileazaScss(fisier);
+            }
+        });
+    } else {
+        console.log("[SCSS] Folderul resurse/scss nu există încă.");
+    }
+} catch (err) {
+    console.error("[EROARE SCSS] Problemă la compilarea inițială:", err.message);
+}
+
+// 5. COMPILARE PE PARCURS (Watch)
+try {
+    if (fs.existsSync(global.obGlobal.folderScss)) {
+        fs.watch(global.obGlobal.folderScss, (eventType, filename) => {
+            if (filename && path.extname(filename) === '.scss') {
+                // Verificăm dacă fișierul nu a fost șters între timp
+                let caleAbsoluta = path.join(global.obGlobal.folderScss, filename);
+                if (fs.existsSync(caleAbsoluta)) {
+                    console.log(`[SCSS WATCH] Modificare detectată la ${filename}.`);
+                    compileazaScss(filename);
+                }
+            }
+        });
+    }
+} catch (err) {
+    console.error("[EROARE WATCH SCSS] Nu am putut inițializa watch pe folderul SCSS:", err.message);
+}
+// =======================================================
+
 // --- 5. RUTE ---
 
 // Cerinta: Afisare cai
@@ -161,13 +251,86 @@ app.get("/favicon.ico", (req, res) => {
     res.sendFile(path.join(__dirname, "resurse/imagini/favicon/favicon.ico"));
 });
 
-// Cerinta: Index cu vector de rute
-app.get(["/", "/index", "/home"], (req, res) => {
-    res.render("pages/index", { ip: req.ip });
+
+// --- LOGICA DE GALERIE (Paginile care folosesc galeria) ---
+// Prindem pagina principală și pagina galeriei în același loc
+app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
+    
+    // 1. Citim fisierul JSON
+    let jsonPath = path.join(__dirname, 'resurse', 'json', 'galerie.json');
+    
+    // Verificare preventivă: dacă nu ai apucat să faci JSON-ul încă, să nu pice serverul
+    if (!fs.existsSync(jsonPath)) {
+        console.warn("Fisierul galerie.json nu exista! Randam fara galerie.");
+        return res.render(req.path === '/galerie' ? 'pages/galerie' : 'pages/index', { ip: req.ip, imaginiGalerie: [] });
+    }
+
+    let dateGalerie = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    let imagini = dateGalerie.imagini;
+    let caleGalerie = dateGalerie.cale_galerie;
+
+    // 2. Variabilă pentru PREZENTARE
+    let oraTestare = null; // ex: "11:30"
+    
+    let d = new Date();
+    let minCurente = d.getHours() * 60 + d.getMinutes();
+    
+    if (oraTestare) {
+        let parti = oraTestare.split(":");
+        minCurente = parseInt(parti[0]) * 60 + parseInt(parti[1]);
+    }
+
+    // 3. Filtrare dupa timp
+    let imaginiFiltrate = imagini.filter(img => {
+        let [start, end] = img.timp.split('-');
+        let [startH, startM] = start.split(':');
+        let [endH, endM] = end.split(':');
+        
+        let minStart = parseInt(startH) * 60 + parseInt(startM);
+        let minEnd = parseInt(endH) * 60 + parseInt(endM);
+        
+        return minCurente >= minStart && minCurente <= minEnd;
+    });
+
+    // 4. Trunchiere la maxim 10 imagini
+    if (imaginiFiltrate.length > 10) {
+        imaginiFiltrate = imaginiFiltrate.slice(0, 10);
+    }
+
+    // 5. Generare imagini responsive (sharp)
+    for (let img of imaginiFiltrate) {
+        let originalPath = path.join(__dirname, caleGalerie, img.cale_imagine);
+        let numeFaraExtensie = img.cale_imagine.split('.')[0];
+        let extensie = img.cale_imagine.split('.')[1];
+        
+        img.cale_mica = `${caleGalerie}${numeFaraExtensie}-mic.${extensie}`;
+        img.cale_medie = `${caleGalerie}${numeFaraExtensie}-mediu.${extensie}`;
+
+        let fullSmallPath = path.join(__dirname, img.cale_mica);
+        let fullMediumPath = path.join(__dirname, img.cale_medie);
+
+        if (fs.existsSync(originalPath)) {
+            if (!fs.existsSync(fullSmallPath)) {
+                await sharp(originalPath).resize(300).toFile(fullSmallPath);
+            }
+            if (!fs.existsSync(fullMediumPath)) {
+                await sharp(originalPath).resize(500).toFile(fullMediumPath);
+            }
+        }
+    }
+
+    // 6. Alegem template-ul corect
+    let templateName = req.path === '/galerie' ? 'galerie' : 'index';
+    
+    res.render(`pages/${templateName}`, { 
+        ip: req.ip, // Păstrăm IP-ul cum aveai tu inițial pe /
+        imaginiGalerie: imaginiFiltrate,
+        caleBaza: caleGalerie
+    });
 });
 
+
 // Cerinta: Eroare 400 pentru fisiere .ejs
-// Folosim RegExp pentru a evita eroarea de parametru missing
 app.get(/\/[^/]*\.ejs$/, (req, res) => {
     afisareEroare(res, 400);
 });
@@ -177,11 +340,10 @@ app.get(/^\/resurse\/.*\/$/, (req, res) => {
     afisareEroare(res, 403);
 });
 
-// Cerinta: Ruta generala /* (trebuie sa fie ULTIMA)
-// Folosim paranteze capturante conform noii sintaxe Express
-// Cerinta: Ruta generala (trebuie sa fie ULTIMA)
+
+// --- RUTA GENERALA (TREBUIE SĂ FIE ULTIMA DEFINITĂ) ---
 app.get("/:pagina", (req, res) => {
-    let pagina = req.params.pagina; // preluam numele paginii din URL
+    let pagina = req.params.pagina; 
     
     res.render("pages/" + pagina, { ip: req.ip }, function(err, rezultatRandare) {
         if (err) {

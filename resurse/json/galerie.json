@@ -1,0 +1,105 @@
+{
+  "cale_galerie": "/resurse/imagini/galerie/",
+  "imagini": [
+    {
+      "cale_imagine": "minge.png",
+      "titlu": "Minge Oficială EHF",
+      "descriere": "Minge de handbal profesională pentru meciuri internaționale.",
+      "timp": "08:00-14:00",
+      "alt": "Minge handbal EHF",
+      "licenta": "CC0"
+    },
+    {
+      "cale_imagine": "poarta.png",
+      "titlu": "Poartă Handbal",
+      "descriere": "Poartă standard 3x2m pentru antrenament și competiții.",
+      "timp": "10:00-19:00",
+      "licenta": "CC-BY: Autor John Doe"
+    },
+    {
+      "cale_imagine": "adidasi.png",
+      "titlu": "Pantofi Sport Indoor",
+      "descriere": "Pantofi cu aderență ridicată, special concepuți pentru podelele din sală.",
+      "timp": "00:00-23:59",
+      "alt": "Adidași handbal"
+    },
+    {
+      "cale_imagine": "tricou.png",
+      "titlu": "Tricou de Joc",
+      "descriere": "Tricou respirabil, rezistent la trageri și uzură.",
+      "timp": "06:00-18:00",
+      "licenta": "CC0"
+    },
+    {
+      "cale_imagine": "sort.png",
+      "titlu": "Șort Sport",
+      "descriere": "Șort confortabil ce permite libertate maximă de mișcare.",
+      "timp": "06:00-18:00"
+    },
+    {
+      "cale_imagine": "genunchiere.png",
+      "titlu": "Genunchiere Protectoare",
+      "descriere": "Genunchiere cu spumă densă pentru amortizarea căzăturilor pe parchet.",
+      "timp": "10:00-22:00",
+      "alt": "Genunchiere handbal"
+    },
+    {
+      "cale_imagine": "cotiere.png",
+      "titlu": "Cotiere Handbal",
+      "descriere": "Protecție esențială pentru brațe în timpul aruncărilor și plonjoanelor.",
+      "timp": "10:00-22:00"
+    },
+    {
+      "cale_imagine": "clister.png",
+      "titlu": "Rășină (Clister)",
+      "descriere": "Rășină specială pentru a îmbunătăți prinderea mingii (grip-ul).",
+      "timp": "14:00-23:59",
+      "licenta": "CC-BY: Autor SportsPics"
+    },
+    {
+      "cale_imagine": "bandaj.png",
+      "titlu": "Bandaj Kinesiologic",
+      "descriere": "Bandă pentru suport muscular și prevenirea accidentărilor.",
+      "timp": "00:00-23:59"
+    },
+    {
+      "cale_imagine": "geanta.png",
+      "titlu": "Geantă de Antrenament",
+      "descriere": "Geantă spațioasă cu compartiment separat pentru încălțăminte.",
+      "timp": "07:00-15:00",
+      "licenta": "CC0"
+    },
+    {
+      "cale_imagine": "fluier.png",
+      "titlu": "Fluier Arbitru",
+      "descriere": "Fluier profesional fără bilă, folosit de arbitrii oficiali.",
+      "timp": "16:00-23:59"
+    },
+    {
+      "cale_imagine": "sticla.png",
+      "titlu": "Sticlă de Apă",
+      "descriere": "Sticlă ergonomică de 1L pentru hidratare în timpul meciului.",
+      "timp": "00:00-23:59"
+    },
+    {
+      "cale_imagine": "conuri.png",
+      "titlu": "Conuri Antrenament",
+      "descriere": "Set de conuri pentru exerciții de agilitate și trasee.",
+      "timp": "08:00-13:00",
+      "alt": "Conuri sport"
+    },
+    {
+      "cale_imagine": "tabela.png",
+      "titlu": "Tabelă de Marcaj",
+      "descriere": "Tabelă electronică pentru afișarea scorului și a timpului de joc.",
+      "timp": "17:00-23:00"
+    },
+    {
+      "cale_imagine": "plasa.png",
+      "titlu": "Plasă de Rezervă",
+      "descriere": "Plasă rezistentă pentru poarta de handbal.",
+      "timp": "09:00-17:00",
+      "licenta": "CC0"
+    }
+  ]
+}

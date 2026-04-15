@@ -4,7 +4,7 @@
         "titlu":"Eroare !!!",
         "text": "A survenit o eroare neașteptată.",
         "imagine":"interzis.png"
-    },
+    }, 
     "info_erori": [
         {
             "identificator": 404,
@@ -28,4 +28,4 @@
             "imagine": "eroare400.png"
         }
     ]
-}
+} 

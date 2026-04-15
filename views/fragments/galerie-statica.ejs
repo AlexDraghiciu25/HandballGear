@@ -1,0 +1,22 @@
+<div class="container-galerie">
+    <div class="galerie-statica">
+        <% for(let i = 0; i < imaginiGalerie.length; i++) { 
+            let img = imaginiGalerie[i]; 
+            let attribAlt = img.alt ? img.alt : img.titlu;
+            let attribTitle = img.descriere;
+            if(img.licenta) attribTitle += ` (Licență: ${img.licenta})`;
+        %>
+            <figure>
+                <picture>
+                    <source media="(max-width: 576px)" srcset="<%- img.cale_mica %>">
+                    <source media="(max-width: 992px)" srcset="<%- img.cale_medie %>">
+                    <img src="<%- caleBaza %><%- img.cale_imagine %>" alt="<%- attribAlt %>" title="<%- attribTitle %>">
+                </picture>
+                <figcaption>
+                    <strong><%- img.titlu %></strong> <br>
+                    <small><%- img.timp %></small>
+                </figcaption>
+            </figure>
+        <% } %>
+    </div>
+</div> 
