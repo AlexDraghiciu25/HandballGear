@@ -270,3 +270,21 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
         }
     }
 }
+
+// Selecție text (0.025p)
+::selection { background-color: $primary; color: white; }
+
+// Text pe coloane (0.025p)
+.text-coloane {
+    column-count: 1;
+    @media (min-width: 1024px) { column-count: 3; column-rule: 2px solid $primary; }
+}
+
+// Text animat (0.05p)
+.container-marquee {
+    width: 100%; overflow: hidden; background: $secondary; color: white; padding: 10px 0;
+}
+.text-marquee {
+    display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite;
+}
+@keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }

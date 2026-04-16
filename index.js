@@ -124,6 +124,27 @@ function initErori() {
 }
 initErori();
 
+function verificaDateGalerie() {
+    try {
+        const jsonPath = path.join(__dirname, 'resurse/json/galerie.json');
+        if (!fs.existsSync(jsonPath)) return;
+        const date = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+        const folderGal = path.join(__dirname, date.cale_galerie);
+
+        if (!fs.existsSync(folderGal)) {
+            console.error(`[EROARE JSON] Folderul "${date.cale_galerie}" NU există!`);
+        } else {
+            date.imagini.forEach(img => {
+                let caleImg = path.join(folderGal, img.cale_imagine);
+                if (!fs.existsSync(caleImg)) {
+                    console.error(`[EROARE JSON] Imaginea "${img.cale_imagine}" lipsește din folder!`);
+                }
+            });
+        }
+    } catch (err) { console.error('[EROARE JSON] Galerie invalidă.'); }
+}
+verificaDateGalerie();
+
 // --- BONUS 5: Verificare Date Galerie JSON ---
 function verificaDateGalerie() {
     try {
