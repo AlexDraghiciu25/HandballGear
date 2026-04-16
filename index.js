@@ -124,6 +124,34 @@ function initErori() {
 }
 initErori();
 
+// --- BONUS 5: Verificare Date Galerie JSON ---
+function verificaDateGalerie() {
+    try {
+        const jsonPath = path.join(__dirname, 'resurse/json/galerie.json');
+        if (!fs.existsSync(jsonPath)) return;
+
+        const date = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+        const folderGal = path.join(__dirname, date.cale_galerie);
+
+        // (0.025) Verificăm dacă folderul specificat în "cale_galerie" există
+        if (!fs.existsSync(folderGal)) {
+            console.error(`[EROARE JSON] Folderul specificat în "cale_galerie" (${date.cale_galerie}) NU există în sistem!`);
+        } else {
+            // (0.025) Verificăm dacă fișierele imagine specificate există fizic
+            date.imagini.forEach(img => {
+                let caleImg = path.join(folderGal, img.cale_imagine);
+                if (!fs.existsSync(caleImg)) {
+                    console.error(`[EROARE JSON] Fișierul imagine "${img.cale_imagine}" lipsește din folderul de galerie!`);
+                }
+            });
+        }
+    } catch (err) {
+        console.error('[EROARE JSON] Galerie: format invalid sau fișier lipsă.');
+    }
+}
+// Apelăm funcția la pornire
+verificaDateGalerie();
+
 // --- 3. FUNCTIE AFISARE EROARE (Cerinta: afisareEroare) ---
 function afisareEroare(res, identificator, titlu, text, imagine) {
     let ed = global.obGlobal.obErori.eroare_default;
@@ -145,7 +173,7 @@ function afisareEroare(res, identificator, titlu, text, imagine) {
 }
 
 // --- 4. CREARE AUTOMATA FOLDERE (Cerinta: vect_foldere) ---
-const vect_foldere = ["temp", "logs", "backup", "fisiere_uploadate"];
+const vect_foldere = ["temp", "logs", "backup", "backup/resurse/css", "fisiere_uploadate"];
 vect_foldere.forEach(f => {
     let cale = path.join(__dirname, f);
     if (!fs.existsSync(cale)) {
@@ -158,84 +186,64 @@ vect_foldere.forEach(f => {
 // =======================================================
 
 // 1. Funcția principală de compilare și backup
+// =======================================================
+// --- COMPILARE AUTOMATĂ SCSS (Update cu Bonus 3 & 4) ---
+// =======================================================
+
 function compileazaScss(caleScss, caleCss) {
-    // Dacă e cale absolută, o lăsăm așa. Dacă e relativă, o lipim de folderScss
-    let absoluteCaleScss = path.isAbsolute(caleScss) ? caleScss : path.join(global.obGlobal.folderScss, caleScss);
-    
-    let absoluteCaleCss;
-    if (!caleCss) {
-        // Dacă nu avem cale CSS, luăm numele SCSS-ului și punem extensia .css
-        let numeFisier = path.basename(absoluteCaleScss, '.scss');
-        absoluteCaleCss = path.join(global.obGlobal.folderCss, numeFisier + '.css');
-    } else {
-        absoluteCaleCss = path.isAbsolute(caleCss) ? caleCss : path.join(global.obGlobal.folderCss, caleCss);
-    }
-
-    // 2. SALVARE ÎN BACKUP
-    // Dacă fișierul CSS există deja, îi facem backup înainte să îl suprascriem
-    if (fs.existsSync(absoluteCaleCss)) {
-        try {
-            // Creăm calea backup/resurse/css
-            let folderBackup = path.join(__dirname, 'backup', 'resurse', 'css');
-            if (!fs.existsSync(folderBackup)) {
-                fs.mkdirSync(folderBackup, { recursive: true });
-            }
-            
-            let numeFisierCss = path.basename(absoluteCaleCss);
-            // Pentru a păstra istoricul, adăugăm un timestamp la numele backup-ului
-            let timestamp = new Date().getTime();
-            let numeBackup = numeFisierCss.replace('.css', `_${timestamp}.css`);
-            let caleFisierBackup = path.join(folderBackup, numeBackup);
-            
-            // Copiem CSS-ul vechi
-            fs.copyFileSync(absoluteCaleCss, caleFisierBackup);
-        } catch (err) {
-            console.error(`[EROARE BACKUP] Nu s-a putut salva backup pentru ${absoluteCaleCss}:`, err.message);
-        }
-    }
-
-    // 3. COMPILAREA PROPRIU-ZISĂ
     try {
+        let absoluteCaleScss = path.isAbsolute(caleScss) ? caleScss : path.join(global.obGlobal.folderScss, caleScss);
+        
+        // Bonus 4: Gestionare corectă a numelor cu mai multe puncte
+        let numeFisierScss = path.basename(absoluteCaleScss);
+        let numeFisierFaraExtensie = numeFisierScss.substring(0, numeFisierScss.lastIndexOf('.'));
+        
+        let absoluteCaleCss = caleCss ? 
+            (path.isAbsolute(caleCss) ? caleCss : path.join(global.obGlobal.folderCss, caleCss)) : 
+            path.join(global.obGlobal.folderCss, `${numeFisierFaraExtensie}.css`);
+
+        // Salvare in backup inainte de suprascriere
+        if (fs.existsSync(absoluteCaleCss)) {
+            let folderBackup = path.join(__dirname, 'backup/resurse/css');
+            if (!fs.existsSync(folderBackup)) fs.mkdirSync(folderBackup, { recursive: true });
+
+            // Bonus 3: Informație de timp (timestamp) în numele backup-ului
+            let timestamp = new Date().getTime(); 
+            let numeBackup = `${numeFisierFaraExtensie}_${timestamp}.css`;
+            let caleBackup = path.join(folderBackup, numeBackup);
+            
+            try {
+                fs.copyFileSync(absoluteCaleCss, caleBackup);
+            } catch (err) {
+                console.error(`[Eroare Backup] Copiere eșuată:`, err.message);
+            }
+        }
+
+        // Compilare
         let rezultat = sass.compile(absoluteCaleScss);
         fs.writeFileSync(absoluteCaleCss, rezultat.css);
-        console.log(`[SCSS Compilat] ${path.basename(absoluteCaleScss)} -> ${path.basename(absoluteCaleCss)}`);
+        console.log(`[SASS] Compilat: ${numeFisierScss} -> ${path.basename(absoluteCaleCss)}`);
+
     } catch (err) {
-        console.error(`[EROARE COMPILARE SCSS] Fișier: ${caleScss}. Eroare:`, err.message);
+        console.error(`[Eroare SASS] la compilarea (${caleScss}):`, err.message);
     }
 }
 
-// 4. COMPILARE INIȚIALĂ (La pornirea serverului)
-try {
-    if (fs.existsSync(global.obGlobal.folderScss)) {
-        let fisiereScss = fs.readdirSync(global.obGlobal.folderScss);
-        fisiereScss.forEach(fisier => {
-            if (path.extname(fisier) === '.scss') {
-                compileazaScss(fisier);
-            }
-        });
-    } else {
-        console.log("[SCSS] Folderul resurse/scss nu există încă.");
-    }
-} catch (err) {
-    console.error("[EROARE SCSS] Problemă la compilarea inițială:", err.message);
+// Compilare inițială
+if (fs.existsSync(global.obGlobal.folderScss)) {
+    fs.readdirSync(global.obGlobal.folderScss).forEach(file => {
+        if (file.endsWith('.scss')) compileazaScss(file);
+    });
 }
 
-// 5. COMPILARE PE PARCURS (Watch)
-try {
-    if (fs.existsSync(global.obGlobal.folderScss)) {
-        fs.watch(global.obGlobal.folderScss, (eventType, filename) => {
-            if (filename && path.extname(filename) === '.scss') {
-                // Verificăm dacă fișierul nu a fost șters între timp
-                let caleAbsoluta = path.join(global.obGlobal.folderScss, filename);
-                if (fs.existsSync(caleAbsoluta)) {
-                    console.log(`[SCSS WATCH] Modificare detectată la ${filename}.`);
-                    compileazaScss(filename);
-                }
-            }
-        });
-    }
-} catch (err) {
-    console.error("[EROARE WATCH SCSS] Nu am putut inițializa watch pe folderul SCSS:", err.message);
+// Watcher (Compilare pe parcurs)
+if (fs.existsSync(global.obGlobal.folderScss)) {
+    fs.watch(global.obGlobal.folderScss, (event, filename) => {
+        if (filename && filename.endsWith('.scss')) {
+            let caleAbs = path.join(global.obGlobal.folderScss, filename);
+            if (fs.existsSync(caleAbs)) compileazaScss(filename);
+        }
+    });
 }
 // =======================================================
 

@@ -8,29 +8,111 @@
 <body id="top">
     <%- include('../fragments/header.ejs') %>
 
-    <main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
-        
-        <h1 style="text-align: center; color: var(--culoare-highlight, #333);">Despre HandballGear</h1>
-        
-        <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">
-            Suntem pasionați de handbal și oferim cele mai bune echipamente pentru performanță maximă pe teren. 
-            Magazinul nostru a fost fondat din dorința de a aduce la un loc cele mai bune branduri pentru profesioniști și amatori.
-        </p>
+    <div class="container-marquee">
+        <div class="text-marquee">
+            ⚽ Reduceri de sezon la mingile de joc! ⚽ Livrare gratuită la comenzi peste 300 RON! ⚽ Echipamente profesionale pentru portari și jucători de câmp! ⚽
+        </div>
+    </div>
 
-        <section class="sectiune-video-prezentare" style="text-align: center; margin-top: 3rem;">
-            <h2>Urmărește prezentarea noastră</h2>
-            
-            <video id="video-vtt" poster="/resurse/imagini/indoor.jpeg" controls preload="metadata">
+    <main class="container mt-5 mb-5">
+        
+        <h1 class="text-center mb-5 efect-reflexie" data-text="Povestea HandballGear">
+            Povestea HandballGear
+        </h1>
+        
+        <section class="mt-4">
+            <h2 class="mb-3" style="color: #ff6600;">Misiunea Noastră</h2>
+            <div class="text-coloane">
+                <p>
+                    HandballGear a început din pasiunea pură pentru sportul cu mingea la semicerc. Am realizat că sportivii din România au nevoie de un loc specializat unde să găsească nu doar adidași, ci echipamente tehnice de top, folosite de marii campioni. 
+                    De la primele mingi vândute în 2015, am evoluat constant, devenind astăzi partenerul oficial al multor echipe de club. Nu vindem doar produse, oferim consultanță pentru ca fiecare jucător să își găsească armura perfectă.
+                </p>
+                <p>
+                    Calitatea este prioritatea noastră absolută. Lucrăm direct cu producători de renume mondial pentru a ne asigura că fiecare aderență a mingii și fiecare amortizare a încălțămintei respectă standardele IHF. 
+                    Suntem aici pentru cei care dau totul la antrenamente și pentru cei care decid soarta unui meci în ultima secundă. HandballGear este magazinul tău de încredere, creat de handbaliști pentru handbaliști.
+                </p>
+                <p>
+                    Viziunea noastră este să oferim acces fiecărui jucător din România la cele mai noi tehnologii în echipament sportiv. Nu ne limităm doar la vânzarea de produse. Suntem partenerii tăi în performanță, oferind sfaturi pentru alegerea mărimii potrivite și recomandări pentru întreținerea echipamentului.
+                </p>
+            </div>
+        </section>
+
+        <section class="mt-5 mb-5">
+            <h3 class="text-center mb-3">Spiritul Jocului</h3>
+            <div class="efect-duotone">
+                <div class="d-flex align-items-center justify-content-center h-100">
+                    <h2 class="text-white text-center p-3" style="background: rgba(0,0,0,0.4);">Pasiune. Putere. Precizie.</h2>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-5 p-4 border rounded shadow bg-light text-center">
+            <h3>Echipat pentru Victorie?</h3>
+            <p class="lead">Descoperă noile colecții și profită de avantajele clienților noștri fideli.</p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap mt-3">
+                <button class="btn btn-primary btn-lg">Catalog Echipamente</button>
+                <button class="btn btn-secondary btn-lg">Cerere Ofertă Club</button>
+            </div>
+            <div class="alert alert-primary mt-4" role="alert">
+                <strong>Promoție:</strong> La orice pereche de adidași cumpărată, primești un tub de clister cadou! (Cod: <strong>STIKI24</strong>)
+            </div>
+        </section>
+
+        <section class="mt-5">
+            <h3 class="text-center mb-4">Ghid de Mărimi Mingi (Standard IHF)</h3>
+            <div class="table-responsive">
+                <table class="tabel-responsive-magazin">
+                    <thead>
+                        <tr>
+                            <th>Mărime</th>
+                            <th>Categorie</th>
+                            <th>Circumferință</th>
+                            <th>Greutate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="Mărime">Mărimea 3</td>
+                            <td data-label="Categorie">Bărbați (>16 ani)</td>
+                            <td data-label="Circumferință">58 - 60 cm</td>
+                            <td data-label="Greutate">425 - 475 g</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Mărime">Mărimea 2</td>
+                            <td data-label="Categorie">Femei / Juniori (12-16 ani)</td>
+                            <td data-label="Circumferință">54 - 56 cm</td>
+                            <td data-label="Greutate">325 - 375 g</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Mărime">Mărimea 1</td>
+                            <td data-label="Categorie">Copii (8-12 ani)</td>
+                            <td data-label="Circumferință">50 - 52 cm</td>
+                            <td data-label="Greutate">290 - 330 g</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="sectiune-focus mt-5 mb-5 text-white text-center">
+            <div style="background: rgba(44, 62, 80, 0.7); padding: 30px; border-radius: 15px;">
+                <h2>Concentrare Maximă</h2>
+                <p class="lead">Echipamentul potrivit îți dă încrederea să riști aruncarea decisivă.</p>
+            </div>
+        </section>
+
+        <section class="sectiune-video-prezentare mt-5 text-center">
+            <h2>Urmărește prezentarea depozitului nostru</h2>
+            <video id="video-vtt" poster="/resurse/imagini/indoor.jpeg" controls preload="metadata" style="max-width: 100%; border-radius: 10px;">
                 <source src="/resurse/video/prezentare.mp4" type="video/mp4">
                 <source src="/resurse/video/prezentare.webm" type="video/webm">
-                
                 <track src="/resurse/vtt/romana.vtt" kind="subtitles" srclang="ro" label="Română" default>
                 <track src="/resurse/vtt/engleza.vtt" kind="subtitles" srclang="en" label="English">
-                
-                <p>Browserul tău nu suportă elementul video. Te rugăm să folosești un browser mai nou.</p>
+                <p>Browserul tău nu suportă elementul video.</p>
             </video>
         </section>
-        </main>
+
+    </main>
 
     <%- include('../fragments/footer.ejs') %>
 </body>

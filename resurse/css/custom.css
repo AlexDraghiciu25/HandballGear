@@ -11986,3 +11986,116 @@ textarea.form-control-lg {
   transform: scaleY(-1.8) skewX(-50deg);
   filter: blur(2.5px);
 }
+
+/* ========================================================= */
+/* 4. RESTUL CERINȚELOR COMUNE (Efecte CSS)                  */
+/* ========================================================= */
+::selection {
+  background-color: #ff6600;
+  color: #ffffff;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.text-coloane {
+  column-count: 1;
+  column-gap: 30px;
+}
+@media (min-width: 1024px) {
+  .text-coloane {
+    column-count: 3;
+    column-rule: 2px solid #ff6600;
+  }
+}
+
+.container-marquee {
+  width: 100%;
+  overflow: hidden;
+  background: #2c3e50;
+  color: white;
+  padding: 10px 0;
+  margin: 20px 0;
+  border-top: 3px solid #ff6600;
+  border-bottom: 3px solid #ff6600;
+}
+
+.text-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  font-weight: bold;
+  text-transform: uppercase;
+  animation: marquee-handbal 15s linear infinite;
+}
+
+@keyframes marquee-handbal {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+.sectiune-focus {
+  min-height: 400px;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 5px solid #2c3e50;
+  animation: schimbare-fundal-fix 12s infinite alternate ease-in-out;
+}
+
+@keyframes schimbare-fundal-fix {
+  0%, 45% {
+    background-image: url("/resurse/imagini/indoor-1280p.jpeg");
+  }
+  55%, 100% {
+    background-image: url("/resurse/imagini/antrenament-1280p.png");
+  }
+}
+.tabel-responsive-magazin {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 25px 0;
+}
+.tabel-responsive-magazin th, .tabel-responsive-magazin td {
+  padding: 15px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+.tabel-responsive-magazin thead th {
+  background-color: #2c3e50;
+  color: white;
+  text-transform: uppercase;
+}
+@media (max-width: 700px) {
+  .tabel-responsive-magazin thead {
+    display: none;
+  }
+  .tabel-responsive-magazin tr {
+    display: block;
+    margin-bottom: 20px;
+    border: 2px solid #ff6600;
+    border-radius: 12px;
+  }
+  .tabel-responsive-magazin td {
+    display: block;
+    text-align: right;
+    position: relative;
+    padding-left: 50%;
+    border-bottom: 1px solid #eee;
+  }
+  .tabel-responsive-magazin td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    width: 45%;
+    text-align: left;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  .tabel-responsive-magazin td:last-child {
+    border-bottom: 0;
+  }
+}

@@ -145,3 +145,128 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
     filter: blur(2.5px); 
   }
 }
+
+/* ========================================================= */
+/* 4. RESTUL CERINȚELOR COMUNE (Efecte CSS)                  */
+/* ========================================================= */
+
+// --- A. Schimbarea textului selectat (0.025p) ---
+::selection {
+    background-color: $primary; // Portocaliul tău
+    color: $primary-text;       // Albul tău
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+}
+
+// --- B. Scrierea textului pe coloane (0.025p) ---
+.text-coloane {
+    column-count: 1; // Implicit pe mobil
+    column-gap: 30px;
+    
+    // Folosim breakpoint-ul LG (1024px) definit de tine mai sus
+    @media (min-width: 1024px) {
+        column-count: 3;
+        column-rule: 2px solid $primary;
+    }
+}
+
+// --- C. Text care se plimbă orizontal (Animație recurentă) (0.05p) ---
+.container-marquee {
+    width: 100%;
+    overflow: hidden;
+    background: $secondary; // Albastru închis
+    color: white;
+    padding: 10px 0;
+    margin: 20px 0;
+    border-top: 3px solid $primary;
+    border-bottom: 3px solid $primary;
+}
+
+.text-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    font-weight: bold;
+    text-transform: uppercase;
+    animation: marquee-handbal 15s linear infinite;
+}
+
+@keyframes marquee-handbal {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+// --- D. Background fix la scroll cu animație de schimbare (0.05p) ---
+.sectiune-focus {
+    min-height: 400px;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid $secondary;
+    animation: schimbare-fundal-fix 12s infinite alternate ease-in-out;
+}
+
+@keyframes schimbare-fundal-fix {
+    0%, 45% {
+        background-image: url('/resurse/imagini/indoor-1280p.jpeg');
+    }
+    55%, 100% {
+        background-image: url('/resurse/imagini/antrenament-1280p.png');
+    }
+}
+
+// --- E. Tabel Responsive + Transpus (0.05p + 0.025p) ---
+.tabel-responsive-magazin {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    
+    th, td {
+        padding: 15px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+    
+    thead th {
+        background-color: $secondary;
+        color: white;
+        text-transform: uppercase;
+    }
+
+    // Tabelul devine transpus/card pe ecrane mici (sub breakpoint-ul MD de 700px pus de tine)
+    @media (max-width: 700px) {
+        thead {
+            display: none; // Ascundem capul tabelului
+        }
+        
+        tr {
+            display: block;
+            margin-bottom: 20px;
+            border: 2px solid $primary;
+            border-radius: $border-radius;
+        }
+        
+        td {
+            display: block;
+            text-align: right;
+            position: relative;
+            padding-left: 50%;
+            border-bottom: 1px solid #eee;
+            
+            &::before {
+                content: attr(data-label); // Preia numele coloanei
+                position: absolute;
+                left: 15px;
+                width: 45%;
+                text-align: left;
+                font-weight: bold;
+                color: $secondary;
+            }
+            
+            &:last-child {
+                border-bottom: 0;
+            }
+        }
+    }
+}
