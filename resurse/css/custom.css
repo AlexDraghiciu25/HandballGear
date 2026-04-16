@@ -11909,3 +11909,80 @@ textarea.form-control-lg {
 .btn-secondary {
   color: #ffffff !important;
 }
+
+/* REGULA DE AUR PENTRU DUOTONE:
+  c1, c3 = culori ÎNCHISE (pentru umbre)
+  c2, c4 = culori DESCHISE (pentru lumini)
+*/
+.efect-duotone {
+  width: 100%;
+  height: 50vh;
+  min-height: 300px;
+  background-image: url("/resurse/imagini/fundal-duotone.png");
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  isolation: isolate; /* Păstrăm izolarea ca să nu se amestece cu fundalul alb al site-ului */
+  overflow: hidden;
+}
+.efect-duotone::before, .efect-duotone::after {
+  content: "";
+  position: absolute;
+  inset: 0; /* Scurtătură modernă pentru top:0; left:0; right:0; bottom:0; */
+  transition: background-color 0.8s ease-in-out;
+  pointer-events: none;
+}
+.efect-duotone {
+  /* Stratul 1: MULTIPLY aplicat pe culoarea DESCHISĂ */
+}
+.efect-duotone::before {
+  background-color: #00ffcc;
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+.efect-duotone {
+  /* Stratul 2: SCREEN aplicat pe culoarea ÎNCHISĂ */
+}
+.efect-duotone::after {
+  background-color: #00004d;
+  mix-blend-mode: screen;
+  z-index: 2;
+}
+.efect-duotone {
+  /* La HOVER, aducem noile perechi de culori */
+}
+.efect-duotone:hover::before {
+  background-color: #ffcc00; /* Noua culoare deschisă */
+}
+.efect-duotone:hover::after {
+  background-color: #4d0000; /* Noua culoare închisă */
+}
+
+/* --- EFECT REFLEXIE TEXT (0.15p) --- */
+.efect-reflexie {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1.5em; /* Lasă loc suficient dedesubt pentru reflexie */
+}
+.efect-reflexie::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  /* AICI E SECRETUL CARE REPARĂ PROBLEMA: */
+  transform-origin: 50% 0;
+  /* Răsturnăm textul inițial */
+  transform: scaleY(-1);
+  /* Masca pentru ștergerea treptată în jos */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 80%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 80%);
+  filter: blur(2px);
+  transition: transform 0.6s ease-in-out, filter 0.6s ease-in-out;
+  pointer-events: none;
+}
+.efect-reflexie:hover::after {
+  /* Acum, fiind ancorată sus, alungirea se va duce STRICT în jos! */
+  transform: scaleY(-1.8);
+  filter: blur(3.5px);
+}

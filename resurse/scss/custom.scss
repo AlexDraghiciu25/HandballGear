@@ -56,3 +56,91 @@ $spacer: 1.5rem; // Mareste marginile/padding-urile standard (m-1, p-2 etc.)
 .btn-secondary {
     color: $secondary-text !important;
 }
+
+/* REGULA DE AUR PENTRU DUOTONE:
+  c1, c3 = culori ÎNCHISE (pentru umbre)
+  c2, c4 = culori DESCHISE (pentru lumini)
+*/
+$c1: #00004d; // Umbre normal (bleumarin foarte închis)
+$c2: #00ffcc; // Lumini normal (verde mentă luminos)
+
+$c3: #4d0000; // Umbre hover (vișiniu închis)
+$c4: #ffcc00; // Lumini hover (galben luminos)
+
+.efect-duotone {
+  width: 100%;
+  height: 50vh;
+  min-height: 300px;
+  background-image: url('/resurse/imagini/fundal-duotone.png'); 
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  isolation: isolate; /* Păstrăm izolarea ca să nu se amestece cu fundalul alb al site-ului */
+  overflow: hidden;
+
+  &::before, &::after {
+    content: "";
+    position: absolute;
+    inset: 0; /* Scurtătură modernă pentru top:0; left:0; right:0; bottom:0; */
+    transition: background-color 0.8s ease-in-out;
+    pointer-events: none; 
+  }
+
+  /* Stratul 1: MULTIPLY aplicat pe culoarea DESCHISĂ */
+  &::before {
+    background-color: $c2;
+    mix-blend-mode: multiply; 
+    z-index: 1;
+  }
+
+  /* Stratul 2: SCREEN aplicat pe culoarea ÎNCHISĂ */
+  &::after {
+    background-color: $c1;
+    mix-blend-mode: screen; 
+    z-index: 2;
+  }
+
+  /* La HOVER, aducem noile perechi de culori */
+  &:hover::before { 
+    background-color: $c4; /* Noua culoare deschisă */
+  }
+  
+  &:hover::after { 
+    background-color: $c3; /* Noua culoare închisă */
+  }
+}
+
+/* --- EFECT REFLEXIE TEXT (0.15p) --- */
+.efect-reflexie {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1.5em; /* Lasă loc suficient dedesubt pentru reflexie */
+
+  &::after {
+    content: attr(data-text); 
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    
+    /* AICI E SECRETUL CARE REPARĂ PROBLEMA: */
+    transform-origin: 50% 0; 
+    
+    /* Răsturnăm textul inițial */
+    transform: scaleY(-1);
+    
+    /* Masca pentru ștergerea treptată în jos */
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 80%);
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 80%);
+    
+    filter: blur(2px);
+    transition: transform 0.6s ease-in-out, filter 0.6s ease-in-out;
+    pointer-events: none; 
+  }
+
+  &:hover::after {
+    /* Acum, fiind ancorată sus, alungirea se va duce STRICT în jos! */
+    transform: scaleY(-1.8); 
+    filter: blur(3.5px); 
+  }
+}
