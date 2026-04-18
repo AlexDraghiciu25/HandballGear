@@ -304,35 +304,38 @@ app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
         return minCurente >= minStart && minCurente <= minEnd;
     });
 
-    // 1. Galeria Statică (Primele 10)
+    // 1. Galeria Statică (Maxim 10 imagini)
     let imaginiStatice = imaginiFiltrate.slice(0, 10);
 
-    // 2. Galeria Animată (Număr PAR între 6 și 12)
+    // 2. LOGICA PENTRU GALERIA ANIMATĂ (Identificator: galerie-animata)
+    // Alegem un număr par între 6 și 12
     let posibilitati = [6, 8, 10, 12];
-    // Alegem un număr care să nu depășească ce avem filtrat
+    // Filtrăm posibilitățile în funcție de câte poze avem efectiv (filtrate după oră)
     let posibilitatiReale = posibilitati.filter(v => v <= imaginiFiltrate.length);
+    // Dacă nu avem măcar 6 poze, folosim 6 (cerința zice 6-12)
     let nrImaginiAnimat = posibilitatiReale[Math.floor(Math.random() * posibilitatiReale.length)] || 6;
 
+    // Shuffle poze distincte
     let imaginiAmestecate = [...imaginiFiltrate].sort(() => 0.5 - Math.random());
     let imaginiAnimate = imaginiAmestecate.slice(0, nrImaginiAnimat);
 
-    // 3. Generare SASS Dinamic
+    // 3. GENERARE SASS DINAMIC
     let cssGalerieAnimata = "";
-    if (imaginiAnimate.length >= 6) {
-        try {
-            let caleScssAnimat = path.join(__dirname, 'resurse/scss/galerie_animata.scss').replace(/\\/g, '/');
-            let scssDinamic = `
-                $nr-imagini: ${imaginiAnimate.length};
-                @import "${caleScssAnimat}";
-            `;
-            // Folosim compileString pentru a injecta variabila înainte de import
-            cssGalerieAnimata = sass.compileString(scssDinamic).css;
-        } catch (err) {
-            console.error("[Eroare SASS]:", err.message);
-        }
+    try {
+        let caleScssAnimat = path.join(__dirname, 'resurse/scss/galerie_animata.scss').replace(/\\/g, '/');
+        // Injectăm numărul REAL de imagini selectate
+        let scssDinamic = `
+            $nr-imagini: ${imaginiAnimate.length};
+            @import "${caleScssAnimat}";
+        `;
+        cssGalerieAnimata = sass.compileString(scssDinamic).css;
+    } catch (err) {
+        console.error("[Eroare SASS Galerie Animată]:", err.message);
     }
 
-    res.render(req.path === '/galerie' ? 'pages/galerie' : 'pages/index', { 
+    let templateName = req.path === '/galerie' ? 'galerie' : 'index';
+    
+    res.render(`pages/${templateName}`, { 
         ip: req.ip, 
         imaginiGalerie: imaginiStatice,
         imaginiAnimate: imaginiAnimate,
