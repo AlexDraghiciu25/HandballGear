@@ -12099,3 +12099,89 @@ textarea.form-control-lg {
     border-bottom: 0;
   }
 }
+
+::selection {
+  background-color: #ff6600;
+  color: white;
+}
+
+.text-coloane {
+  column-count: 1;
+}
+@media (min-width: 1024px) {
+  .text-coloane {
+    column-count: 3;
+    column-rule: 2px solid #ff6600;
+  }
+}
+
+.container-marquee {
+  width: 100%;
+  overflow: hidden;
+  background: #2c3e50;
+  color: white;
+  padding: 10px 0;
+}
+
+.text-marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 15s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+/* ========================================================= */
+/* 5. STILIZARE HR (Identificator: efect-css-stilizare-hr)   */
+/* ========================================================= */
+hr {
+  border: none;
+  height: 3px; /* Grosimea liniei */
+  background: #ff6600; /* Culoarea principală (Portocaliu) */
+  margin: 4rem 0;
+  position: relative;
+  overflow: visible; /* Important pentru a vedea simbolurile */
+  opacity: 1; /* Reset opacitate Bootstrap */
+  /* Simbolul din STÂNGA (::before) */
+}
+hr::before {
+  content: "★"; /* Caracter Unicode pentru stea plină */
+  position: absolute;
+  left: 20%; /* Poziționare la 20% din lungime */
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white; /* Acoperă linia sub simbol */
+  padding: 0 10px;
+  color: #2c3e50; /* Albastrul tău închis */
+  font-size: 1.5rem;
+  transition: all 0.6s ease-in-out;
+}
+hr {
+  /* Simbolul din DREAPTA (::after) */
+}
+hr::after {
+  content: "★"; /* Caracter Unicode pentru stea plină */
+  position: absolute;
+  right: 20%; /* Poziționare la 20% de marginea din dreapta */
+  top: 50%;
+  transform: translate(50%, -50%);
+  background-color: white; /* Acoperă linia sub simbol */
+  padding: 0 10px;
+  color: #2c3e50;
+  font-size: 1.5rem;
+  transition: all 0.6s ease-in-out;
+}
+hr {
+  /* EFECT LA HOVER: Simbolurile se rotesc și își schimbă culoarea */
+}
+hr:hover::before, hr:hover::after {
+  transform: translate(calc(-50% * var(--dir, 1)), -50%) rotate(360deg);
+  color: #ff6600;
+  cursor: crosshair;
+}

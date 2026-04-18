@@ -282,34 +282,20 @@ app.get("/favicon.ico", (req, res) => {
 
 
 // --- LOGICA DE GALERIE (Paginile care folosesc galeria) ---
-// Prindem pagina principală și pagina galeriei în același loc
 app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
-    
-    // 1. Citim fisierul JSON
     let jsonPath = path.join(__dirname, 'resurse', 'json', 'galerie.json');
     
-    // Verificare preventivă: dacă nu ai apucat să faci JSON-ul încă, să nu pice serverul
     if (!fs.existsSync(jsonPath)) {
-        console.warn("Fisierul galerie.json nu exista! Randam fara galerie.");
-        return res.render(req.path === '/galerie' ? 'pages/galerie' : 'pages/index', { ip: req.ip, imaginiGalerie: [] });
+        return res.render(req.path === '/galerie' ? 'pages/galerie' : 'pages/index', { ip: req.ip, imaginiGalerie: [], cssGalerieAnimata: "" });
     }
 
     let dateGalerie = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
     let imagini = dateGalerie.imagini;
     let caleGalerie = dateGalerie.cale_galerie;
 
-    // 2. Variabilă pentru PREZENTARE
-    let oraTestare = null; // ex: "11:30"
-    
     let d = new Date();
     let minCurente = d.getHours() * 60 + d.getMinutes();
-    
-    if (oraTestare) {
-        let parti = oraTestare.split(":");
-        minCurente = parseInt(parti[0]) * 60 + parseInt(parti[1]);
-    }
 
-    // 3. Filtrare dupa timp
     let imaginiFiltrate = imagini.filter(img => {
         let [start, end] = img.timp.split('-');
         let [startH, startM] = start.split(':');
@@ -317,16 +303,42 @@ app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
         
         let minStart = parseInt(startH) * 60 + parseInt(startM);
         let minEnd = parseInt(endH) * 60 + parseInt(endM);
-        
         return minCurente >= minStart && minCurente <= minEnd;
     });
 
-    // 4. Trunchiere la maxim 10 imagini
-    if (imaginiFiltrate.length > 10) {
-        imaginiFiltrate = imaginiFiltrate.slice(0, 10);
+    // 1. Galeria Statică (Maxim 10 imagini)
+    let imaginiStatice = imaginiFiltrate.slice(0, 10);
+
+    // 2. LOGICA PENTRU GALERIA ANIMATĂ (Bonus 0.5p)
+    // Alegem un număr par aleatoriu între 6 și 12
+    let posibilitati = [6, 8, 10, 12];
+    let nrImaginiAnimat = posibilitati[Math.floor(Math.random() * posibilitati.length)];
+    
+    // Asigurăm că avem destule imagini distincte, altfel folosim câte avem (dar număr par)
+    if (nrImaginiAnimat > imaginiFiltrate.length) {
+        nrImaginiAnimat = imaginiFiltrate.length;
+        if (nrImaginiAnimat % 2 !== 0) nrImaginiAnimat--; // Trebuie să fie par
     }
 
-    // 5. Generare imagini responsive (sharp)
+    // Amestecăm imaginile (Shuffle) pentru a fi distincte și aleatorii la fiecare load
+    let imaginiAmestecate = [...imaginiFiltrate].sort(() => 0.5 - Math.random());
+    let imaginiAnimate = imaginiAmestecate.slice(0, Math.max(6, nrImaginiAnimat)); // minim 6
+
+    // 3. GENERARE SASS DINAMIC
+    let cssGalerieAnimata = "";
+    try {
+        let caleScssAnimat = path.join(__dirname, 'resurse/scss/galerie_animata.scss').replace(/\\/g, '/');
+        // Injectăm variabila de număr și importăm fișierul SCSS
+        let scssDinamic = `
+            $nr-imagini: ${imaginiAnimate.length};
+            @import "${caleScssAnimat}";
+        `;
+        cssGalerieAnimata = sass.compileString(scssDinamic).css;
+    } catch (err) {
+        console.error("[Eroare SASS Galerie Animată]:", err.message);
+    }
+
+    // Generare imagini responsive (sharp)
     for (let img of imaginiFiltrate) {
         let originalPath = path.join(__dirname, caleGalerie, img.cale_imagine);
         let numeFaraExtensie = img.cale_imagine.split('.')[0];
@@ -335,25 +347,22 @@ app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
         img.cale_mica = `${caleGalerie}${numeFaraExtensie}-mic.${extensie}`;
         img.cale_medie = `${caleGalerie}${numeFaraExtensie}-mediu.${extensie}`;
 
-        let fullSmallPath = path.join(__dirname, img.cale_mica);
-        let fullMediumPath = path.join(__dirname, img.cale_medie);
-
         if (fs.existsSync(originalPath)) {
-            if (!fs.existsSync(fullSmallPath)) {
-                await sharp(originalPath).resize(300).toFile(fullSmallPath);
-            }
-            if (!fs.existsSync(fullMediumPath)) {
-                await sharp(originalPath).resize(500).toFile(fullMediumPath);
-            }
+            let fullSmallPath = path.join(__dirname, img.cale_mica);
+            if (!fs.existsSync(fullSmallPath)) await sharp(originalPath).resize(300).toFile(fullSmallPath);
+            
+            let fullMediumPath = path.join(__dirname, img.cale_medie);
+            if (!fs.existsSync(fullMediumPath)) await sharp(originalPath).resize(500).toFile(fullMediumPath);
         }
     }
 
-    // 6. Alegem template-ul corect
     let templateName = req.path === '/galerie' ? 'galerie' : 'index';
     
     res.render(`pages/${templateName}`, { 
-        ip: req.ip, // Păstrăm IP-ul cum aveai tu inițial pe /
-        imaginiGalerie: imaginiFiltrate,
+        ip: req.ip, 
+        imaginiGalerie: imaginiStatice,     // Pentru galeria statică
+        imaginiAnimate: imaginiAnimate,     // Pentru galeria animată
+        cssGalerieAnimata: cssGalerieAnimata, // CSS-ul generat dinamic
         caleBaza: caleGalerie
     });
 });
