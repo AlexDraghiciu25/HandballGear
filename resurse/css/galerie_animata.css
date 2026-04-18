@@ -1,28 +1,32 @@
-.galerie-animata-container {
-  display: none;
+@charset "UTF-8";
+.galerie-animata {
+  display: block;
   width: 600px;
+  max-width: 100%;
   height: 400px;
-  margin: 3rem auto;
   position: relative;
   overflow: hidden;
+  margin: 2rem auto;
+  /* Calea absolută către imaginea ta de border */
   border: 15px solid transparent;
   border-image: url("/resurse/imagini/fundal-duotone.png") 30 round;
 }
-@media (min-width: 1024px) {
-  .galerie-animata-container {
-    display: block;
-  }
-}
-.galerie-animata-container:hover .galerie-animata figure {
+.galerie-animata:hover .galerie-item {
   animation-play-state: paused;
 }
+@media (max-width: 991px) {
+  .galerie-animata {
+    display: none;
+  }
+}
 
-.galerie-animata {
+.galerie-container {
+  position: relative;
   width: 100%;
   height: 100%;
-  position: relative;
 }
-.galerie-animata figure {
+
+.galerie-item {
   position: absolute;
   top: 0;
   left: 0;
@@ -30,73 +34,87 @@
   height: 100%;
   margin: 0;
   opacity: 0;
-  animation: animatie-galerie 24s infinite linear;
+  z-index: -1;
+  animation-name: animatieGalerie;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-duration: 24s;
 }
-.galerie-animata figure img {
+.galerie-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.galerie-animata figure figcaption {
+.galerie-item figcaption {
   position: absolute;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
+  left: 0;
   width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
   text-align: center;
   padding: 10px;
+  margin: 0;
 }
 
-.galerie-animata figure:nth-child(1) {
+.galerie-item:nth-child(1) {
   animation-delay: 0s;
 }
 
-.galerie-animata figure:nth-child(2) {
+.galerie-item:nth-child(2) {
   animation-delay: 4s;
 }
 
-.galerie-animata figure:nth-child(3) {
+.galerie-item:nth-child(3) {
   animation-delay: 8s;
 }
 
-.galerie-animata figure:nth-child(4) {
+.galerie-item:nth-child(4) {
   animation-delay: 12s;
 }
 
-.galerie-animata figure:nth-child(5) {
+.galerie-item:nth-child(5) {
   animation-delay: 16s;
 }
 
-.galerie-animata figure:nth-child(6) {
+.galerie-item:nth-child(6) {
   animation-delay: 20s;
 }
 
-@keyframes animatie-galerie {
+@keyframes animatieGalerie {
   0% {
     opacity: 1;
     transform: translateX(0);
     z-index: 10;
   }
-  8.3333333333% {
+  10% {
     opacity: 1;
     transform: translateX(0);
+    z-index: 10;
   }
-  10.8333333333% {
-    opacity: 1;
-    transform: translateX(20%);
+  12.5% {
+    opacity: 0.8;
+    transform: translateX(30%);
+    z-index: 10;
   }
-  13.3333333333% {
-    opacity: 1;
-    transform: translateX(-20%);
+  15% {
+    opacity: 0.5;
+    transform: translateX(-30%);
+    z-index: 10;
   }
   16.6666666667% {
     opacity: 0;
     transform: translateX(100%);
+    z-index: 10;
+  }
+  16.6676666667% {
+    opacity: 0;
+    transform: translateX(0);
     z-index: -1;
   }
   100% {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(0);
     z-index: -1;
   }
 }

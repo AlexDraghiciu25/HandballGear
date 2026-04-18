@@ -6,9 +6,12 @@
   <meta name="keywords" content="handball, echipament, minge, adidasi, clister, cotiera">
 
   <%- include("../fragments/head.ejs") %>
-  <style>
-        <%- cssAnimat %>
-  </style>
+  
+  <% if (locals.cssGalerieAnimata) { %>
+    <style>
+        <%- cssGalerieAnimata %>
+    </style>
+  <% } %>
 </head>
 
 <body id="top">
@@ -126,9 +129,6 @@
     </section>
 
     <section id="promotii">
-      <h2>Promoții și oferte</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce nec urna eu sapien molestie rhoncus.</p>
-
       <h2>
         <i class="fa-solid fa-tags"></i> 
         Promoții și oferte 
@@ -148,7 +148,6 @@
 
     <section id="evenimente">
       <h2>Evenimente</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi feugiat nisl in enim dictum viverra.</p>
       <ul>
         <li>
           <time datetime="2026-03-07T11:00">7 martie 2026, ora 11:00</time>
@@ -167,27 +166,22 @@
 
     <section id="produse">
       <h2>Categorii de produse</h2>
-
       <section>
         <h3>Îmbrăcăminte</h3>
         <p>Șorturi, tricouri, șosete, trening pentru antrenament și competiție.</p>
       </section>
-
       <section>
         <h3>Pantofi de handbal</h3>
         <p>Pantofi joși și ghete medii/înalte, pentru stabilitate și aderență.</p>
       </section>
-
       <section>
         <h3>Fașe și apărătoare</h3>
         <p>Fașe coate, genunchi și glezne, pentru suport și prevenție.</p>
       </section>
-
       <section>
         <h3>Accesorii</h3>
         <p>Ghiozdane, aparate masaj, fluiere și accesorii de antrenament.</p>
       </section>
-
       <section>
         <h3>Nutriție sportivă</h3>
         <p>Băuturi proteice, batoane proteice, vitamine și minerale.</p>
@@ -196,7 +190,6 @@
 
     <section id="orar">
       <h2>Program</h2>
-
       <table id="tab-orar">
         <caption>Program magazin și intervale de consiliere</caption>
         <thead>
@@ -259,14 +252,11 @@
           </tr>
         </tfoot>
       </table>
-
       <p><strong>Atenție!</strong> În prima zi a lunii facem inventar; livrările pot întârzia.</p>
     </section>
 
     <section id="status">
       <h2>Stoc și cerere</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse interdum mauris quis quam suscipit, sit.</p>
-      
       <p>
         Stoc clister:
         <meter min="0" max="100" low="30" high="70" optimum="60" value="18">18%</meter>
@@ -279,19 +269,14 @@
 
     <section id="faq">
       <h2><i class="fa-solid fa-circle-question"></i> Întrebări frecvente</h2>
-
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam nec nisl lacinia, bibendum risus quis.</p>
-
       <details>
         <summary>Ce mărime de minge aleg?</summary>
         <p>Alege în funcție de vârstă și nivel (juniori/seniori) și consultă ghidul de mărimi.</p>
       </details>
-
       <details>
         <summary>Clisterul este permis peste tot?</summary>
         <p>Nu. Depinde de regulile sălii/competiției.</p>
       </details>
-
       <details>
         <summary>Pot comanda online cu livrare națională?</summary>
         <p>Da, livrăm în mai multe locații din țară prin curier.</p>
@@ -300,12 +285,9 @@
 
     <section id="resurse">
       <h2><i class="fa-solid fa-file-pdf"></i> Resurse</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam quis lorem a libero hendrerit accumsan.</p>
-
       <div class="resource-image">
           <img src="/resurse/imagini/jucator-320p.png" alt="Imagine handbal">
       </div>
-
       <h3>Tabel mărimi (PDF)</h3>
       <div class="pdf-wrapper">
           <object data="/resurse/tabel-marimi-weplayhandball.pdf" type="application/pdf">
@@ -314,134 +296,59 @@
               </p>
           </object>
       </div>
-
       <div class="download-container">
           <a href="/resurse/tabel-marimi-weplayhandball.pdf" download class="btn-modern">
               <i class="fa-solid fa-file-pdf"></i> Descarcă PDF complet
           </a>
       </div>
-
-      <div id="formula">
-        <h3>Formula energiei în sport</h3>
-        <p>Energia dezvoltată într-o mișcare poate fi estimată prin formula:</p>
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <mrow>
-            <mi>E</mi>
-            <mo>=</mo>
-            <mi>m</mi>
-            <mo>⁢</mo>
-            <msup>
-              <mi>v</mi>
-              <mn>2</mn>
-            </msup>
-          </mrow>
-        </math>
-      </div>
     </section>
-
   </div>
 
   <section id="tutoriale">
     <h2>Tutoriale</h2>
-
-    <p>Linkurile de mai jos se deschid în cadrul videoclipului.</p>
-
     <div class="container-iframe">
       <div class="taburi-iframe">
         <a href="https://www.youtube.com/embed/pTlKqF4Q0Yo" target="ifr-video" class="btn-tab">Tehnica aruncării</a>
         <a href="https://www.youtube.com/embed/0x7f_ovMEkg" target="ifr-video" class="btn-tab">Încălzire</a>
-        <a href="https://www.youtube.com/embed/xRkNK5WG33A" target="ifr-video" class="btn-tab">Aplicare clister și curățarea mingii</a><br>
+        <a href="https://www.youtube.com/embed/xRkNK5WG33A" target="ifr-video" class="btn-tab">Aplicare clister</a>
       </div>
-
       <div class="video-wrapper">
-        <iframe
-          width="560"
-          height="315"
-          src="https://www.youtube.com/embed/xRkNK5WG33A"
-          name="ifr-video"
-          title="Tutorial handbal"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen>
-        </iframe>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/xRkNK5WG33A" name="ifr-video" allowfullscreen></iframe>
       </div>
-    </div>
-
-    <h3>Playlist antrenament handbal</h3>
-    <div class="video-wrapper">
-        <iframe
-          width="560"
-          height="315"
-          src="https://www.youtube.com/embed?playlist=pTlKqF4Q0Yo,0x7f_ovMEkg&loop=1&controls=1"
-          title="Playlist handbal"
-          allowfullscreen>
-        </iframe>
     </div>
   </section>
 
-  <section id="galerie-statica">
-    <h2>Galerie</h2>
-
+  <section id="galerie-statica" class="container mt-5">
+    <h2>Galerie Statică</h2>
     <%- include('../fragments/galerie-statica') %>
+  </section>
 
-    <div id="grid-galerie">
-      <figure>
-        <picture>
-          <source srcset="/resurse/imagini/echipamente-320p.png" media="(max-width:700px)">
-          <source srcset="/resurse/imagini/echipamente-768p.png" media="(max-width:1200px)">
-          <img 
-            src="/resurse/imagini/echipamente-1280p.png"
-            alt="Echipament de handbal"
-            title="Echipament handbal"
-            loading="lazy">
-        </picture>
-        <figcaption>Echipament</figcaption>
-      </figure>
-
-      <figure>
-        <picture>
-          <source srcset="/resurse/imagini/antrenamente-320p.png" media="(max-width:700px)">
-          <source srcset="/resurse/imagini/antrenamente-768p.png" media="(max-width:1200px)">
-          <img 
-            src="/resurse/imagini/antrenamente-1280p.png"
-            alt="Antrenament de handbal"
-            title="Antrenament handbal"
-            loading="lazy">
-        </picture>
-        <figcaption>Antrenament</figcaption>
-      </figure>
-
-      <figure>
-        <picture>
-          <source srcset="/resurse/imagini/indoor-320p.jpeg" media="(max-width:700px)">
-          <source srcset="/resurse/imagini/indoor-768p.jpeg" media="(max-width:1200px)">
-          <img src="/resurse/imagini/indoor-1280p.jpeg"
-              alt="Pantofi indoor pentru handbal"
-              title="Pantofi indoor handbal">
-        </picture>
-        <figcaption>Indoor</figcaption>
-      </figure>
+  <section id="galerie-animata" class="galerie-animata">
+    <h2>Galerie Animată</h2>
+    <div class="galerie-container">
+        <% if (locals.imaginiAnimate && imaginiAnimate.length > 0) { %>
+            <% imaginiAnimate.forEach(function(img) { %>
+                <figure class="galerie-item">
+                    <img src="<%- caleBaza %><%- img.cale_imagine %>" alt="<%- img.titlu %>">
+                    <figcaption><%- img.titlu %></figcaption>
+                </figure>
+            <% }); %>
+        <% } else { %>
+            <p>Se încarcă galeria...</p>
+        <% } %>
     </div>
+  </section>
 
-    <section id="zone-echipament">
+  <section id="zone-echipament" class="container mt-5 mb-5">
       <h3>Zone echipament handbal</h3>
-
       <picture>
         <source media="(min-width:1201px)" srcset="/resurse/imagini/poza-interactiva-1280p.png">
-        <source media="(min-width:701px)" srcset="/resurse/imagini/poza-interactiva-768p.png">
-        <img src="/resurse/imagini/poza-interactiva-320p.png"
-             usemap="#map1280"
-             alt="Zone echipament handbal">
+        <img src="/resurse/imagini/poza-interactiva-320p.png" usemap="#map1280" alt="Zone echipament">
       </picture>
-
       <map name="map1280">
-        <area shape="rect" coords="770,450,950,610" href="/minge" alt="Minge" title="Minge de handbal">
-        <area shape="rect" coords="600,200,950,650" href="/tricou" alt="Tricou" title="Tricou jucător">
-        <area shape="rect" coords="600,650,900,850" href="/pantaloni" alt="Pantaloni" title="Șort jucător">
-        <area shape="rect" coords="700,750,850,950" href="/genunchere" alt="Genunchere" title="Genuncheră (protecție)">
-        <area shape="rect" coords="500,800,650,1050" href="/adidasi" alt="Adidasi" title="Adidași indoor (piciorul din spate)">
-        <area shape="rect" coords="950,1150,1100,1300" href="/adidasi" alt="Adidasi" title="Adidași indoor (piciorul din față)">
+        <area shape="rect" coords="770,450,950,610" href="/minge" alt="Minge">
+        <area shape="rect" coords="600,200,950,650" href="/tricou" alt="Tricou">
       </map>
-      </section>
   </section>
 
 </main>
