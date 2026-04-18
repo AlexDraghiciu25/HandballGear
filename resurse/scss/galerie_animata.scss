@@ -1,37 +1,28 @@
-// Setăm un timp de afișare pentru fiecare imagine (ex: 4 secunde)
-$nr-imagini: 6 !default; // Această linie „păcălește” editorul să creadă că variabila există
-$timp-pe-imagine: 4s;
-$timp-total: $nr-imagini * $timp-pe-imagine;
-$procent-imagine: 100 / $nr-imagini; 
+// Variabila $nr-imagini vine din index.js
+$nr-imagini: 6 !default; 
+$timp-imagine: 3s; // Cât stă o imagine pe ecran
+$durata-totala: $nr-imagini * $timp-imagine;
 
 .galerie-animata {
-    display: block;
-    width: 600px;
-    max-width: 100%;
-    height: 400px;
+    width: 500px; 
+    height: 350px;
     position: relative;
     overflow: hidden;
-    margin: 2rem auto;
+    margin: 20px auto;
     
-    /* Calea absolută către imaginea ta de border */
+    // Border-image (cerință obligatorie)
     border: 15px solid transparent;
     border-image: url('/resurse/imagini/fundal-duotone.png') 30 round; 
 
-    // Pauză animație pe hover
+    // Oprire la hover
     &:hover .galerie-item {
         animation-play-state: paused;
     }
 
-    // Ascundere pe ecrane medii și mici (max-width: 991px)
+    // Ascundere pe ecrane medii și mici
     @media (max-width: 991px) {
         display: none;
     }
-}
-
-.galerie-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
 }
 
 .galerie-item {
@@ -40,83 +31,39 @@ $procent-imagine: 100 / $nr-imagini;
     left: 0;
     width: 100%;
     height: 100%;
-    margin: 0;
-    opacity: 0; 
-    z-index: -1;
-
-    animation-name: animatieGalerie;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-duration: $timp-total;
+    opacity: 0;
+    z-index: 0;
+    animation: animatieComplexa $durata-totala infinite linear;
 
     img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
-
-    figcaption {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        color: white;
-        text-align: center;
-        padding: 10px;
-        margin: 0;
-    }
 }
 
-// Generăm delay-ul pentru fiecare imagine
+// Calculăm delay pentru fiecare imagine
 @for $i from 1 through $nr-imagini {
     .galerie-item:nth-child(#{$i}) {
-        animation-delay: ($i - 1) * $timp-pe-imagine;
+        animation-delay: ($i - 1) * $timp-imagine;
     }
 }
 
-// Calculăm procentele în avans pentru a nu supăra linterul din editor
-$p-pauza: $procent-imagine * 0.6;
-$p-dreapta1: $procent-imagine * 0.75;
-$p-stanga: $procent-imagine * 0.9;
-$p-iesire: $procent-imagine;
-$p-reset: $procent-imagine + 0.001;
+// Procentul ocupat de o singură imagine în timeline-ul total
+$p: 100% / $nr-imagini;
 
-// Definim keyframes folosind variabilele precalculate
-@keyframes animatieGalerie {
-    0% {
-        opacity: 1;
-        transform: translateX(0);
-        z-index: 10;
-    }
-    #{$p-pauza}% {
-        opacity: 1;
-        transform: translateX(0);
-        z-index: 10;
-    }
-    #{$p-dreapta1}% {
-        opacity: 0.8;
-        transform: translateX(30%);
-        z-index: 10;
-    }
-    #{$p-stanga}% {
-        opacity: 0.5;
-        transform: translateX(-30%);
-        z-index: 10;
-    }
-    #{$p-iesire}% {
-        opacity: 0;
-        transform: translateX(100%);
-        z-index: 10;
-    }
-    #{$p-reset}% {
-        opacity: 0;
-        transform: translateX(0);
-        z-index: -1;
-    }
-    100% {
-        opacity: 0;
-        transform: translateX(0);
-        z-index: -1;
-    }
+@keyframes animatieComplexa {
+    0% { opacity: 1; z-index: 10; transform: translateX(0); }
+    
+    // Pas 1: Glisare la dreapta
+    #{ $p * 0.3 } { transform: translateX(20%); opacity: 1; }
+    
+    // Pas 2: Glisare la stânga
+    #{ $p * 0.6 } { transform: translateX(-20%); opacity: 1; }
+    
+    // Pas 3: Glisare la dreapta finală + micșorare opacitate (Ieșire)
+    #{ $p } { transform: translateX(100%); opacity: 0; z-index: 0; }
+    
+    // Restul timpului rămâne ascunsă
+    100% { opacity: 0; z-index: 0; }
 }

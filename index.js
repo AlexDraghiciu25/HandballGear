@@ -281,12 +281,12 @@ app.get("/favicon.ico", (req, res) => {
 });
 
 
-// --- LOGICA DE GALERIE (Paginile care folosesc galeria) ---
+// --- LOGICA DE GALERIE (Actualizat) ---
 app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
     let jsonPath = path.join(__dirname, 'resurse', 'json', 'galerie.json');
     
     if (!fs.existsSync(jsonPath)) {
-        return res.render(req.path === '/galerie' ? 'pages/galerie' : 'pages/index', { ip: req.ip, imaginiGalerie: [], cssGalerieAnimata: "" });
+        return res.render('pages/index', { imaginiGalerie: [], cssGalerieAnimata: "", caleBaza: "" });
     }
 
     let dateGalerie = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
@@ -296,77 +296,50 @@ app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
     let d = new Date();
     let minCurente = d.getHours() * 60 + d.getMinutes();
 
+    // Filtrare identică cu galeria statică
     let imaginiFiltrate = imagini.filter(img => {
         let [start, end] = img.timp.split('-');
-        let [startH, startM] = start.split(':');
-        let [endH, endM] = end.split(':');
-        
-        let minStart = parseInt(startH) * 60 + parseInt(startM);
-        let minEnd = parseInt(endH) * 60 + parseInt(endM);
+        let minStart = parseInt(start.split(':')[0]) * 60 + parseInt(start.split(':')[1]);
+        let minEnd = parseInt(end.split(':')[0]) * 60 + parseInt(end.split(':')[1]);
         return minCurente >= minStart && minCurente <= minEnd;
     });
 
-    // 1. Galeria Statică (Maxim 10 imagini)
+    // 1. Galeria Statică (Primele 10)
     let imaginiStatice = imaginiFiltrate.slice(0, 10);
 
-    // 2. LOGICA PENTRU GALERIA ANIMATĂ (Bonus 0.5p)
-    // Alegem un număr par aleatoriu între 6 și 12
+    // 2. Galeria Animată (Număr PAR între 6 și 12)
     let posibilitati = [6, 8, 10, 12];
-    let nrImaginiAnimat = posibilitati[Math.floor(Math.random() * posibilitati.length)];
-    
-    // Asigurăm că avem destule imagini distincte, altfel folosim câte avem (dar număr par)
-    if (nrImaginiAnimat > imaginiFiltrate.length) {
-        nrImaginiAnimat = imaginiFiltrate.length;
-        if (nrImaginiAnimat % 2 !== 0) nrImaginiAnimat--; // Trebuie să fie par
-    }
+    // Alegem un număr care să nu depășească ce avem filtrat
+    let posibilitatiReale = posibilitati.filter(v => v <= imaginiFiltrate.length);
+    let nrImaginiAnimat = posibilitatiReale[Math.floor(Math.random() * posibilitatiReale.length)] || 6;
 
-    // Amestecăm imaginile (Shuffle) pentru a fi distincte și aleatorii la fiecare load
     let imaginiAmestecate = [...imaginiFiltrate].sort(() => 0.5 - Math.random());
-    let imaginiAnimate = imaginiAmestecate.slice(0, Math.max(6, nrImaginiAnimat)); // minim 6
+    let imaginiAnimate = imaginiAmestecate.slice(0, nrImaginiAnimat);
 
-    // 3. GENERARE SASS DINAMIC
+    // 3. Generare SASS Dinamic
     let cssGalerieAnimata = "";
-    try {
-        let caleScssAnimat = path.join(__dirname, 'resurse/scss/galerie_animata.scss').replace(/\\/g, '/');
-        // Injectăm variabila de număr și importăm fișierul SCSS
-        let scssDinamic = `
-            $nr-imagini: ${imaginiAnimate.length};
-            @import "${caleScssAnimat}";
-        `;
-        cssGalerieAnimata = sass.compileString(scssDinamic).css;
-    } catch (err) {
-        console.error("[Eroare SASS Galerie Animată]:", err.message);
-    }
-
-    // Generare imagini responsive (sharp)
-    for (let img of imaginiFiltrate) {
-        let originalPath = path.join(__dirname, caleGalerie, img.cale_imagine);
-        let numeFaraExtensie = img.cale_imagine.split('.')[0];
-        let extensie = img.cale_imagine.split('.')[1];
-        
-        img.cale_mica = `${caleGalerie}${numeFaraExtensie}-mic.${extensie}`;
-        img.cale_medie = `${caleGalerie}${numeFaraExtensie}-mediu.${extensie}`;
-
-        if (fs.existsSync(originalPath)) {
-            let fullSmallPath = path.join(__dirname, img.cale_mica);
-            if (!fs.existsSync(fullSmallPath)) await sharp(originalPath).resize(300).toFile(fullSmallPath);
-            
-            let fullMediumPath = path.join(__dirname, img.cale_medie);
-            if (!fs.existsSync(fullMediumPath)) await sharp(originalPath).resize(500).toFile(fullMediumPath);
+    if (imaginiAnimate.length >= 6) {
+        try {
+            let caleScssAnimat = path.join(__dirname, 'resurse/scss/galerie_animata.scss').replace(/\\/g, '/');
+            let scssDinamic = `
+                $nr-imagini: ${imaginiAnimate.length};
+                @import "${caleScssAnimat}";
+            `;
+            // Folosim compileString pentru a injecta variabila înainte de import
+            cssGalerieAnimata = sass.compileString(scssDinamic).css;
+        } catch (err) {
+            console.error("[Eroare SASS]:", err.message);
         }
     }
 
-    let templateName = req.path === '/galerie' ? 'galerie' : 'index';
-    
-    res.render(`pages/${templateName}`, { 
+    res.render(req.path === '/galerie' ? 'pages/galerie' : 'pages/index', { 
         ip: req.ip, 
-        imaginiGalerie: imaginiStatice,     // Pentru galeria statică
-        imaginiAnimate: imaginiAnimate,     // Pentru galeria animată
-        cssGalerieAnimata: cssGalerieAnimata, // CSS-ul generat dinamic
+        imaginiGalerie: imaginiStatice,
+        imaginiAnimate: imaginiAnimate,
+        cssGalerieAnimata: cssGalerieAnimata,
         caleBaza: caleGalerie
     });
 });
-
 
 // Cerinta: Eroare 400 pentru fisiere .ejs
 app.get(/\/[^/]*\.ejs$/, (req, res) => {
