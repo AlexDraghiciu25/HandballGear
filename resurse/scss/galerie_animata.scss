@@ -1,24 +1,22 @@
-$nr-imagini: 6 !default; // Fallback
-$timp-per-poza: 3s; 
-$durata-totala: $nr-imagini * $timp-per-poza;
+$nr-imagini: 6 !default; 
+$timp-per-imagine: 3s; 
+$durata-totala: $nr-imagini * $timp-per-imagine;
 
 .galerie-animata {
     width: 500px;
     height: 350px;
     position: relative;
     overflow: hidden;
-    margin: 30px auto;
+    margin: 40px auto;
     border: 15px solid transparent;
     border-image: url('/resurse/imagini/fundal-duotone.png') 30 round; 
-    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
 
     &:hover .galerie-item {
         animation-play-state: paused;
     }
 
-    @media (max-width: 991px) {
-        display: none; // Nu se afișează pe ecrane medii și mici
-    }
+    @media (max-width: 991px) { display: none; }
 }
 
 .galerie-item {
@@ -30,34 +28,30 @@ $durata-totala: $nr-imagini * $timp-per-poza;
     margin: 0;
     animation: animatieComplexa $durata-totala infinite linear;
 
-    img {
-        width: 100%; height: 100%;
-        object-fit: cover;
-    }
+    img { width: 100%; height: 100%; object-fit: cover; }
     figcaption {
         position: absolute; bottom: 0; width: 100%;
-        background: rgba(0,0,0,0.7); color: white; text-align: center; padding: 5px;
+        background: rgba(0, 0, 0, 0.7); color: white; text-align: center; padding: 5px 0;
     }
 }
 
-// Delay-uri automate
 @for $i from 1 through $nr-imagini {
     .galerie-item:nth-child(#{$i}) {
-        animation-delay: ($i - 1) * $timp-per-poza;
+        animation-delay: ($i - 1) * $timp-per-imagine;
     }
 }
 
-$p: 100% / $nr-imagini; // Procentul unei poze
+$p: 100% / $nr-imagini; // Procentul ocupat de o poză din timeline-ul total
 
 @keyframes animatieComplexa {
     0% { opacity: 1; z-index: 10; transform: translateX(0); }
-    // Dreapta
+    // 1. Glisare la dreapta
     #{ $p * 0.3 } { transform: translateX(25%); opacity: 1; }
-    // Stânga
+    // 2. Glisare la stânga
     #{ $p * 0.6 } { transform: translateX(-25%); opacity: 1; }
-    // Dreapta + Ieșire + Opacitate
+    // 3. Ieșire la dreapta + opacitate 0
     #{ $p * 0.9 } { transform: translateX(100%); opacity: 0; z-index: 10; }
-    // Reset pentru următoarea tură
+    // Final de ciclu pentru poza curentă
     #{ $p } { transform: translateX(0); opacity: 0; z-index: 0; }
     100% { opacity: 0; }
 }

@@ -281,12 +281,11 @@ app.get("/favicon.ico", (req, res) => {
 });
 
 
-// --- LOGICA DE GALERIE (Actualizat) ---
+// --- LOGICA DE GALERIE (Actualizată pentru stabilitate) ---
 app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
     let jsonPath = path.join(__dirname, 'resurse', 'json', 'galerie.json');
-    
     if (!fs.existsSync(jsonPath)) {
-        return res.render('pages/index', { imaginiGalerie: [], cssGalerieAnimata: "", caleBaza: "" });
+        return res.render('pages/index', { ip: req.ip, imaginiGalerie: [], cssGalerieAnimata: "", caleBaza: "" });
     }
 
     let dateGalerie = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
@@ -296,7 +295,7 @@ app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
     let d = new Date();
     let minCurente = d.getHours() * 60 + d.getMinutes();
 
-    // Filtrare identică cu galeria statică
+    // Filtrare poze (aceeași logică pentru ambele galerii)
     let imaginiFiltrate = imagini.filter(img => {
         let [start, end] = img.timp.split('-');
         let minStart = parseInt(start.split(':')[0]) * 60 + parseInt(start.split(':')[1]);
@@ -308,33 +307,28 @@ app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
     let imaginiStatice = imaginiFiltrate.slice(0, 10);
 
     // 2. LOGICA PENTRU GALERIA ANIMATĂ (Identificator: galerie-animata)
-    // Alegem un număr par între 6 și 12
+    // Dacă filtrul de timp returnează prea puține poze (sub 6), folosim tot setul pentru a respecta cerința 6-12
+    let sursaPoze = imaginiFiltrate.length >= 6 ? imaginiFiltrate : imagini;
+    
     let posibilitati = [6, 8, 10, 12];
-    // Filtrăm posibilitățile în funcție de câte poze avem efectiv (filtrate după oră)
-    let posibilitatiReale = posibilitati.filter(v => v <= imaginiFiltrate.length);
-    // Dacă nu avem măcar 6 poze, folosim 6 (cerința zice 6-12)
-    let nrImaginiAnimat = posibilitatiReale[Math.floor(Math.random() * posibilitatiReale.length)] || 6;
+    let nrImaginiAnimat = posibilitati.filter(v => v <= sursaPoze.length).pop() || 6;
 
-    // Shuffle poze distincte
-    let imaginiAmestecate = [...imaginiFiltrate].sort(() => 0.5 - Math.random());
-    let imaginiAnimate = imaginiAmestecate.slice(0, nrImaginiAnimat);
+    let imaginiAnimate = [...sursaPoze].sort(() => 0.5 - Math.random()).slice(0, nrImaginiAnimat);
 
     // 3. GENERARE SASS DINAMIC
     let cssGalerieAnimata = "";
     try {
         let caleScssAnimat = path.join(__dirname, 'resurse/scss/galerie_animata.scss').replace(/\\/g, '/');
-        // Injectăm numărul REAL de imagini selectate
         let scssDinamic = `
             $nr-imagini: ${imaginiAnimate.length};
             @import "${caleScssAnimat}";
         `;
         cssGalerieAnimata = sass.compileString(scssDinamic).css;
     } catch (err) {
-        console.error("[Eroare SASS Galerie Animată]:", err.message);
+        console.error("[Eroare SASS Galerie]:", err.message);
     }
 
     let templateName = req.path === '/galerie' ? 'galerie' : 'index';
-    
     res.render(`pages/${templateName}`, { 
         ip: req.ip, 
         imaginiGalerie: imaginiStatice,

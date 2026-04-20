@@ -3,10 +3,10 @@
   height: 350px;
   position: relative;
   overflow: hidden;
-  margin: 30px auto;
+  margin: 40px auto;
   border: 15px solid transparent;
   border-image: url("/resurse/imagini/fundal-duotone.png") 30 round;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 .galerie-animata:hover .galerie-item {
   animation-play-state: paused;
@@ -40,7 +40,7 @@
   background: rgba(0, 0, 0, 0.7);
   color: white;
   text-align: center;
-  padding: 5px;
+  padding: 5px 0;
 }
 
 .galerie-item:nth-child(1) {
