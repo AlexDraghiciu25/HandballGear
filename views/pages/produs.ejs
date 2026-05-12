@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <title><%= produs.nume %> - Handball Gear</title>
+  <meta name="description" content="<%= produs.descriere %>">
+  <meta name="keywords" content="handball, echipament, <%= produs.nume %>, <%= produs.categorie_mare %>">
+
+  <%- include("../fragments/head.ejs") %>
+  <link rel="stylesheet" href="/resurse/css/produs.css">
+</head>
+
+<body id="top">
+
+<div id="watermark-print">Draghiciu<br>Alexandru</div>
+
+<%- include("../fragments/header.ejs") %>
+
+<main>
+  <section class="container mt-5">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Acasă</a></li>
+        <li class="breadcrumb-item"><a href="/produse">Produse</a></li>
+        <li class="breadcrumb-item"><a href="/produse?categorie=<%= produs.categorie_mare %>"><%= produs.categorie_mare %></a></li>
+        <li class="breadcrumb-item active" aria-current="page"><%= produs.nume %></li>
+      </ol>
+    </nav>
+
+    <article id="produs-detalii" class="produs-unic">
+      <h1><%= produs.nume %></h1>
+      
+      <div class="produs-layout">
+        <!-- Prima coloana: imagine -->
+        <div class="coloana-img">
+          <img src="<%= produs.imagine %>" alt="<%= produs.nume %>">
+        </div>
+        
+        <!-- A doua coloana: toate detaliile -->
+        <div class="coloana-detalii">
+          <p class="categorie"><strong>Categorie:</strong> <%= produs.categorie_mare %></p>
+          <p class="subcategorie"><strong>Subcategorie:</strong> <%= produs.subcategorie %></p>
+          <p class="pret"><strong>Preț:</strong> <span class="pret-valoare"><%= produs.pret %> Lei</span></p>
+          
+          <hr>
+          
+          <h3>Caracteristici complete:</h3>
+          <ul class="caracteristici-complete">
+            <li><strong>ID Produs:</strong> <%= produs.id %></li>
+            <li><strong>Greutate:</strong> <%= produs.caracteristica_numerica %>g</li>
+            <li><strong>Culoare:</strong> <%= produs.culoare %></li>
+            <li><strong>Caracteristici disponibile:</strong> <%= produs.caracteristici_multi %></li>
+            <li><strong>Data intrării în ofertă:</strong> <time datetime="<%= produs.data_intrare %>"><%= new Date(prod.data_intrare).toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %></time></li>
+            <li><strong>Produs nou:</strong> <%= produs.este_noutate ? 'Da' : 'Nu' %></li>
+          </ul>
+          
+          <hr>
+          
+          <h3>Descriere completă:</h3>
+          <p class="descriere-completa"><%= produs.descriere %></p>
+          
+          <div class="actiuni">
+            <button class="btn btn-primary btn-lg">
+              <i class="fa-solid fa-cart-shopping"></i> Adaugă în coș
+            </button>
+            <a href="/produse" class="btn btn-outline-secondary">Înapoi la produse</a>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+</main>
+
+<%- include("../fragments/footer.ejs") %>
+
+</body>
+</html>

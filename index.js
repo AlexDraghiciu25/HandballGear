@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const sharp = require('sharp');
 const sass = require('sass');
+const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
 const PORT = 8080;
@@ -13,6 +14,130 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Definire folder resurse ca static
 app.use('/resurse', express.static(path.join(__dirname, 'resurse')));
+
+// --- 1.1 BAZA DE DATE PRODUSE (Cerinta 1.2p) ---
+let db;
+function initDatabase() {
+    const dbPath = path.join(__dirname, 'resurse/database/produse.db');
+    db = new sqlite3.Database(dbPath, (err) => {
+        if (err) {
+            console.error('[EROARE DB] Nu s-a putut conecta la baza de date:', err.message);
+            return;
+        }
+        console.log('[OK] Conexiune la baza de date SQLite stabilită');
+    });
+    
+    // Creare tabel dacă nu există
+    db.run(`
+        CREATE TABLE IF NOT EXISTS produse (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nume TEXT NOT NULL,
+            descriere TEXT,
+            imagine TEXT,
+            categorie_mare TEXT CHECK(categorie_mare IN ('Mingi', 'Adidasi', 'Accesorii', 'Protectie', 'Echipament')),
+            subcategorie TEXT,
+            pret REAL NOT NULL,
+            caracteristica_numerica REAL,
+            data_intrare DATE DEFAULT CURRENT_TIMESTAMP,
+            culoare TEXT,
+            caracteristici_multi TEXT,
+            este_noutate INTEGER DEFAULT 0
+        )
+    `, (err) => {
+        if (err) {
+            console.error('[EROARE DB] Nu s-a putut crea tabelul:', err.message);
+        } else {
+            console.log('[OK] Tabel produse verificat/creat');
+        }
+    });
+}
+
+// Funcție helper pentru interogări DB
+function getProduse(categorie, callback) {
+    let sql = 'SELECT * FROM produse';
+    let params = [];
+    
+    if (categorie && categorie !== 'toate') {
+        sql += ' WHERE categorie_mare = ?';
+        params.push(categorie);
+    }
+    
+    sql += ' ORDER BY id ASC';
+    
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            console.error('[EROARE DB]', err.message);
+            callback([]);
+        } else {
+            callback(rows);
+        }
+    });
+}
+
+function getProdusById(id, callback) {
+    db.get('SELECT * FROM produse WHERE id = ?', [id], (err, row) => {
+        if (err) {
+            console.error('[EROARE DB]', err.message);
+            callback(null);
+        } else {
+            callback(row);
+        }
+    });
+}
+
+function getCategorii(callback) {
+    db.all('SELECT DISTINCT categorie_mare FROM produse ORDER BY categorie_mare', (err, rows) => {
+        if (err) {
+            console.error('[EROARE DB]', err.message);
+            // Fallback la categorii statice
+            callback(['Mingi', 'Adidasi', 'Accesorii', 'Protectie', 'Echipament']);
+        } else {
+            callback(rows.map(r => r.categorie_mare));
+        }
+    });
+}
+
+// Inițializează baza de date la pornire
+initDatabase();
+
+// Populare date inițiale (dacă tabelul e gol)
+db.get('SELECT COUNT(*) as cnt FROM produse', (err, row) => {
+    if (row && row.cnt === 0) {
+        console.log('[INFO] Se populează baza de date cu produse...');
+        
+        const produseInitiale = [
+            {nume:'Minge Handbal IHF Pro',descriere:'Minge oficială de competiție, aprobată IHF, pentru meciuri și antrenamente.',imagine:'/resurse/imagini/produse/minge-ihf.png',categorie_mare:'Mingi',subcategorie:'Competitie',pret:89.99,caracteristica_numerica:325,data_intrare:'2026-01-15',culoare:'Albastru',caracteristici_multi:'oficiala,IHF,competitie',este_noutate:1},
+            {nume:'Minge Antrenament Basic',descriere:'Minge de antrenament durabilă, ideală pentru sesiuni de pregătire.',imagine:'/resurse/imagini/produse/minge-basic.png',categorie_mare:'Mingi',subcategorie:'Antrenament',pret:45.50,caracteristica_numerica:300,data_intrare:'2025-11-20',culoare:'Rosu',caracteristici_multi:'antrement,durabila',este_noutate:0},
+            {nume:'Minge Juniori Size 0',descriere:'Minge dedicată copiilor sub 8 ani, ușoară și manevrabilă.',imagine:'/resurse/imagini/produse/minge-juniori.png',categorie_mare:'Mingi',subcategorie:'Juniori',pret:35.00,caracteristica_numerica:250,data_intrare:'2026-02-10',culoare:'Galben',caracteristici_multi:'juniori,copii',este_noutate:1},
+            {nume:'Adidasi Handbal Speed',descriere:'Adidași profesionali cu talpă aderentă pentru interior.',imagine:'/resurse/imagini/produse/adidasi-speed.png',categorie_mare:'Adidasi',subcategorie:'Profesionisti',pret:249.99,caracteristica_numerica:320,data_intrare:'2026-03-01',culoare:'Negru',caracteristici_multi:'grip,interior,profesionisti',este_noutate:1},
+            {nume:'Adidasi Indoor Comfort',descriere:'Adidași confortabili pentru antrenament zilnic.',imagine:'/resurse/imagini/produse/adidasi-comfort.png',categorie_mare:'Adidasi',subcategorie:'Antrenament',pret:159.99,caracteristica_numerica:350,data_intrare:'2025-12-15',culoare:'Alb',caracteristici_multi:'comfort,antrement',este_noutate:0},
+            {nume:'Adidasi Youth Junior',descriere:'Adidași pentru tineri, flexibili și ușori.',imagine:'/resurse/imagini/produse/adidasi-youth.png',categorie_mare:'Adidasi',subcategorie:'Juniori',pret:119.99,caracteristica_numerica:280,data_intrare:'2026-01-25',culoare:'Rosu',caracteristici_multi:'tineri,flexibili',este_noutate:0},
+            {nume:'Banda Absorbtie Umiditate',descriere:'Banda de absorbtie pentru mana, 50 buc/set.',imagine:'/resurse/imagini/produse/banda-absortie.png',categorie_mare:'Accesorii',subcategorie:'Accesorii',pret:24.99,caracteristica_numerica:50,data_intrare:'2025-10-05',culoare:'Alb',caracteristici_multi:'absorbtie,set',este_noutate:0},
+            {nume:'Fluiere Arbitru Profesional',descriere:'Fluier profesional cu sunet clar, incl. curea.',imagine:'/resurse/imagini/produse/fluier.png',categorie_mare:'Accesorii',subcategorie:'Accesorii',pret:39.99,caracteristica_numerica:30,data_intrare:'2025-09-20',culoare:'Negru',caracteristici_multi:'arbitru,profesionist',este_noutate:0},
+            {nume:'Geanta Echipament Sport',descriere:'Geanta spatioasa pentru echipament, cu buzunare.',imagine:'/resurse/imagini/produse/geanta.png',categorie_mare:'Accesorii',subcategorie:'Accesorii',pret:79.99,caracteristica_numerica:800,data_intrare:'2026-02-28',culoare:'Negru',caracteristici_multi:'spatioasa,buzunare',este_noutate:1},
+            {nume:'Cotiera Protectie Pro',descriere:'Cotiera cu protectie spumă, pentru impact.',imagine:'/resurse/imagini/produse/cotiera-pro.png',categorie_mare:'Protectie',subcategorie:'Cotiere',pret:44.99,caracteristica_numerica:85,data_intrare:'2025-11-10',culoare:'Negru',caracteristici_multi:'protectie,impact',este_noutate:0},
+            {nume:'Genunchiera Impact Extra',descriere:'Genunchiera pentru protectie la alunecare.',imagine:'/resurse/imagini/produse/genunchiera.png',categorie_mare:'Protectie',subcategorie:'Genunchiere',pret:54.99,caracteristica_numerica:120,data_intrare:'2025-12-01',culoare:'Alb',caracteristici_multi:'protectie,alunecare',este_noutate:0},
+            {nume:'Protecie Tibie Handbal',descriere:'Protecie tibie pentru portari.',imagine:'/resurse/imagini/produse/tibie.png',categorie_mare:'Protectie',subcategorie:'Portari',pret:69.99,caracteristica_numerica:200,data_intrare:'2026-01-05',culoare:'Negru',caracteristici_multi:'portari,protectie',este_noutate:0},
+            {nume:'Tricou Jucator Profesional',descriere:'Tricou din poliester respirabil, rapid.',imagine:'/resurse/imagini/produse/tricou.png',categorie_mare:'Echipament',subcategorie:'Tricouri',pret:34.99,caracteristica_numerica:150,data_intrare:'2025-08-15',culoare:'Albastru',caracteristici_multi:'polister,respirabil',este_noutate:0},
+            {nume:'Sort Competitie Elastic',descriere:'Sort elastic pentru competitie, miscare libera.',imagine:'/resurse/imagini/produse/sort.png',categorie_mare:'Echipament',subcategorie:'Sorturi',pret:29.99,caracteristica_numerica:120,data_intrare:'2025-08-15',culoare:'Albastru',caracteristici_multi:'elastic,competitie',este_noutate:0},
+            {nume:'Set Antrenament Complet',descriere:'Set incl. tricou, sort, sosete, pentru club.',imagine:'/resurse/imagini/produse/set-echipament.png',categorie_mare:'Echipament',subcategorie:'Seturi',pret:89.99,caracteristica_numerica:450,data_intrare:'2026-03-10',culoare:'Verde',caracteristici_multi:'set,club,complet',este_noutate:1},
+            {nume:'Pompa Aer Mingi',descriere:'Pompa manuala pentru umflarea mingilor.',imagine:'/resurse/imagini/produse/pompa.png',categorie_mare:'Accesorii',subcategorie:'Accesorii',pret:19.99,caracteristica_numerica:100,data_intrare:'2025-07-20',culoare:'Gri',caracteristici_multi:'pompa,manuala',este_noutate:0},
+            {nume:'Clister 500ml Bottle',descriere:'Clister pentru aderentă minge, 500ml.',imagine:'/resurse/imagini/produse/clister.png',categorie_mare:'Accesorii',subcategorie:'Accesorii',pret:29.99,caracteristica_numerica:500,data_intrare:'2025-06-15',culoare:'Transparent',caracteristici_multi:'aderenta,500ml',este_noutate:0},
+            {nume:'Sosete Handbal Algodon',descriere:'Sosete confortabile cu suport pentru glezna.',imagine:'/resurse/imagini/produse/sosete.png',categorie_mare:'Echipament',subcategorie:'Sosete',pret:14.99,caracteristica_numerica:50,data_intrare:'2025-09-01',culoare:'Alb',caracteristici_multi:'algodon,confort',este_noutate:0},
+            {nume:'Marsupiul Sport cu Buzunar',descriere:'Marsupiu pentru obiecte mici, cu fermoar.',imagine:'/resurse/imagini/produse/marsupiu.png',categorie_mare:'Accesorii',subcategorie:'Accesorii',pret:34.99,caracteristica_numerica:80,data_intrare:'2026-02-20',culoare:'Negru',caracteristici_multi:'buzunar,fermoar',este_noutate:1},
+            {nume:'Filet Sac Echipament',descriere:'Filet pentru transport mingi si accesorii.',imagine:'/resurse/imagini/produse/filet.png',categorie_mare:'Accesorii',subcategorie:'Accesorii',pret:22.99,caracteristica_numerica:150,data_intrare:'2025-10-30',culoare:'Verde',caracteristici_multi:'filet,transport',este_noutate:0}
+        ];
+        
+        const stmt = db.prepare(`INSERT INTO produse (nume, descriere, imagine, categorie_mare, subcategorie, pret, caracteristica_numerica, data_intrare, culoare, caracteristici_multi, este_noutate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+        
+        produseInitiale.forEach(p => {
+            stmt.run([p.nume, p.descriere, p.imagine, p.categorie_mare, p.subcategorie, p.pret, p.caracteristica_numerica, p.data_intrare, p.culoare, p.caracteristici_multi, p.este_noutate]);
+        });
+        
+        stmt.finalize();
+        console.log('[OK] S-au adăugat ' + produseInitiale.length + ' produse în baza de date');
+    }
+});
 
 // Variabila globala pentru erori (Cerinta)
 global.obGlobal = {
@@ -278,6 +403,37 @@ console.log("Folder lucru (cwd):", process.cwd());
 // Cerinta: Favicon
 app.get("/favicon.ico", (req, res) => {
     res.sendFile(path.join(__dirname, "resurse/imagini/favicon/favicon.ico"));
+});
+
+
+// --- PAGINA PRODUSE (Cerinta 1.2p) ---
+app.get("/produse", (req, res) => {
+    let categorie = req.query.categorie || 'toate';
+    
+    getCategorii(categorii => {
+        getProduse(categorie, produse => {
+            res.render('pages/produse', {
+                ip: req.ip,
+                produse: produse,
+                categorii: categorii,
+                categorieSelectata: categorie
+            });
+        });
+    });
+});
+
+app.get("/produs/:id", (req, res) => {
+    let id = parseInt(req.params.id);
+    
+    getProdusById(id, produs => {
+        if (!produs) {
+            return afisareEroare(res, 404);
+        }
+        res.render('pages/produs', {
+            ip: req.ip,
+            produs: produs
+        });
+    });
 });
 
 

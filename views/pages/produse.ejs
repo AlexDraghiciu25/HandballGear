@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <title>Produse - Handball Gear</title>
+  <meta name="description" content="Toate produsele de echipament handbal: mingi, adidași, protecții și accesorii.">
+  <meta name="keywords" content="handball, echipament, produse, minge, adidasi, protectie">
+
+  <%- include("../fragments/head.ejs") %>
+  <link rel="stylesheet" href="/resurse/css/produse.css">
+</head>
+
+<body id="top">
+
+<div id="watermark-print">Draghiciu<br>Alexandru</div>
+
+<%- include("../fragments/header.ejs") %>
+
+<main>
+  <section id="filtre-produse" class="container mt-4">
+    <h1>Produse Handball Gear</h1>
+    
+    <!-- Sectiune filtre (nu e form) -->
+    <div class="filtre-container">
+      <!-- Input text: cuvant cheie in descriere -->
+      <div class="filtru-grup">
+        <label for="filtru-descriere">Cuvânt cheie în descriere:</label>
+        <input type="text" id="filtru-descriere" placeholder="Ex: profesional, durabil...">
+      </div>
+
+      <!-- Textarea: nume produs (cautare partiala) -->
+      <div class="filtru-grup">
+        <label for="filtru-nume">Caută după nume:</label>
+        <textarea id="filtru-nume" rows="2" placeholder="Scrie numele produsului (parțial)..."></textarea>
+      </div>
+
+      <!-- Input range: pret -->
+      <div class="filtru-grup">
+        <label for="filtru-pret">Preț maxim: <span id="pret-valoare">(0 - 300)</span></label>
+        <input type="range" id="filtru-pret" min="0" max="300" value="300">
+      </div>
+
+      <!-- Datalist: culori disponibile -->
+      <div class="filtru-grup">
+        <label for="filtru-culoare">Culoare:</label>
+        <input list="culori-list" id="filtru-culoare" placeholder="Alege culoare...">
+        <datalist id="culori-list">
+          <option value="Albastru">
+          <option value="Alb">
+          <option value="Negru">
+          <option value="Rosu">
+          <option value="Galben">
+          <option value="Verde">
+          <option value="Gri">
+          <option value="Transparent">
+        </datalist>
+      </div>
+
+      <!-- Radio buttons: categorie -->
+      <div class="filtru-grup">
+        <label>Categorie:</label>
+        <div class="radio-grup">
+          <label><input type="radio" name="categorie" value="toate" checked> Oricare</label>
+          <% categorii.forEach(function(cat) { %>
+            <label><input type="radio" name="categorie" value="<%= cat %>"> <%= cat %></label>
+          <% }); %>
+        </div>
+      </div>
+
+      <!-- Checkbox: noutati -->
+      <div class="filtru-grup">
+        <label>
+          <input type="checkbox" id="filtru-noutati"> 
+          Noutăți (produse introduse după 01.01.2026)
+        </label>
+      </div>
+
+      <!-- Select simplu: subcategorie -->
+      <div class="filtru-grup">
+        <label for="filtru-subcategorie">Subcategorie:</label>
+        <select id="filtru-subcategorie">
+          <option value="oricare">Oricare</option>
+          <option value="Competitie">Competiție</option>
+          <option value="Antrenament">Antrenament</option>
+          <option value="Juniori">Juniori</option>
+          <option value="Profesionisti">Profesioniști</option>
+          <option value="Accesorii">Accesorii</option>
+          <option value="Cotiere">Cotiere</option>
+          <option value="Genunchiere">Genunchiere</option>
+          <option value="Portari">Portari</option>
+          <option value="Tricouri">Tricouri</option>
+          <option value="Sorturi">Sorturi</option>
+          <option value="Seturi">Seturi</option>
+          <option value="Sosete">Sosete</option>
+        </select>
+      </div>
+
+      <!-- Select multiplu: caracteristici multi -->
+      <div class="filtru-grup">
+        <label for="filtru-caract-multi">Caracteristici (selectează multiple):</label>
+        <select id="filtru-caract-multi" multiple size="5">
+          <option value="oficiala">oficială</option>
+          <option value="IHF">IHF</option>
+          <option value="competitie">competiție</option>
+          <option value="antrement">antrenament</option>
+          <option value="durabila">durabilă</option>
+          <option value="juniori">juniori</option>
+          <option value="copii">copii</option>
+          <option value="grip">grip</option>
+          <option value="interior">interior</option>
+          <option value="profesionisti">profesioniști</option>
+          <option value="comfort">comfort</option>
+          <option value="absorbtie">absorbție</option>
+          <option value="set">set</option>
+          <option value="arbitru">arbitru</option>
+          <option value="protectie">protecție</option>
+          <option value="impact">impact</option>
+          <option value="alunecare">alunecare</option>
+          <option value="polister">poliester</option>
+          <option value="respirabil">respirabil</option>
+          <option value="elastic">elastic</option>
+          <option value="club">club</option>
+          <option value="complet">complet</option>
+          <option value="aderenta">aderență</option>
+          <option value="algodon">bumbac</option>
+          <option value="buzunar">buzunar</option>
+        </select>
+      </div>
+
+      <!-- Butoane -->
+      <div class="butoane-filtre">
+        <button type="button" id="btn-filtreaza" class="btn btn-primary">Filtrează</button>
+        <button type="button" id="btn-sort-asc" class="btn btn-secondary">Sortare ↑</button>
+        <button type="button" id="btn-sort-desc" class="btn btn-secondary">Sortare ↓</button>
+        <button type="button" id="btn-calcula" class="btn btn-info">Calculează</button>
+        <button type="button" id="btn-reset" class="btn btn-warning">Resetează</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Afisare produse in grid -->
+  <section id="grid-produse" class="container mt-4">
+    <div class="produse-grid">
+      <% if (produse.length === 0) { %>
+        <p class="text-center">Nu există produse în această categorie.</p>
+      <% } else { %>
+        <% produse.forEach(function(prod) { %>
+          <article id="artc-<%= prod.id %>" class="produs-card <%= prod.categorie_mare.replace(/\s/g, '') %>">
+            <h2><%= prod.nume %></h2>
+            
+            <div class="produs-layout">
+              <!-- Prima coloana: imagine si caracteristici -->
+              <div class="coloana-img">
+                <img src="<%= prod.imagine %>" alt="<%= prod.nume %>">
+                
+                <ul class="caracteristici-list">
+                  <li><strong>Greutate:</strong> <%= prod.caracteristica_numerica %>g</li>
+                  <li><strong>Culoare:</strong> <%= prod.culoare %></li>
+                  <li><strong>Caracteristici:</strong> <%= prod.caracteristici_multi %></li>
+                  <li><strong>Data intrării:</strong> <time datetime="<%= prod.data_intrare %>"><%= new Date(prod.data_intrare).toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %></time></li>
+                  <li><strong>Noutate:</strong> <%= prod.este_noutate ? 'Da' : 'Nu' %></li>
+                </ul>
+              </div>
+              
+              <!-- A doua coloana: categorie, subcategorie, descriere -->
+              <div class="coloana-detalii">
+                <p class="categorie"><strong>Categorie:</strong> <%= prod.categorie_mare %></p>
+                <p class="subcategorie"><strong>Subcategorie:</strong> <%= prod.subcategorie %></p>
+                <p class="pret"><strong>Preț:</strong> <%= prod.pret %> Lei</p>
+                <p class="descriere"><%= prod.descriere %></p>
+                <a href="/produs/<%= prod.id %>" class="btn btn-sm btn-outline-primary">Vezi detalii</a>
+              </div>
+            </div>
+          </article>
+        <% }); %>
+      <% } %>
+    </div>
+  </section>
+</main>
+
+<%- include("../fragments/footer.ejs") %>
+
+<!-- Script pentru filtrare/sortare/calculare -->
+<script>
+// Date produse pentru filtrare client-side
+const produseDate = JSON.parse('<%- JSON.stringify(produse) %>');
+
+// Element rezultat calcul (va fi creat dinamic)
+let rezultatCalcul = null;
+
+// Functie de filtrare
+function filtreaza() {
+    const descriere = document.getElementById('filtru-descriere').value.toLowerCase();
+    const nume = document.getElementById('filtru-nume').value.toLowerCase();
+    const pretMax = parseInt(document.getElementById('filtru-pret').value);
+    const culoare = document.getElementById('filtru-culoare').value.toLowerCase();
+    const categorie = document.querySelector('input[name="categorie"]:checked').value;
+    const noutati = document.getElementById('filtru-noutati').checked;
+    const subcategorie = document.getElementById('filtru-subcategorie').value;
+    
+    // Validare inputuri
+    if (descriere && /\d/.test(descriere)) {
+        alert('Cuvântul cheie nu trebuie să conțină cifre!');
+        return;
+    }
+    if (nume && /\d/.test(nume)) {
+        alert('Numele nu trebuie să conțină cifre!');
+        return;
+    }
+    
+    const dataNoutati = new Date('2026-01-01');
+    
+    produseDate.forEach(prod => {
+        const elem = document.getElementById('artc-' + prod.id);
+        if (!elem) return;
+        
+        let show = true;
+        
+        // Filtrare dupa nume (incepe cu)
+        if (nume && !prod.nume.toLowerCase().startsWith(nume)) show = false;
+        
+        // Filtrare dupa descriere (cuvant cheie)
+        if (descriere && !prod.descriere.toLowerCase().includes(descriere)) show = false;
+        
+        // Filtrare dupa pret
+        if (prod.pret > pretMax) show = false;
+        
+        // Filtrare dupa culoare
+        if (culoare && !prod.culoare.toLowerCase().includes(culoare)) show = false;
+        
+        // Filtrare dupa categorie
+        if (categorie !== 'toate' && prod.categorie_mare !== categorie) show = false;
+        
+        // Filtrare dupa noutati
+        if (noutati) {
+            const dataProd = new Date(prod.data_intrare);
+            if (dataProd < dataNoutati) show = false;
+        }
+        
+        // Filtrare dupa subcategorie
+        if (subcategorie !== 'oricare' && prod.subcategorie !== subcategorie) show = false;
+        
+        elem.style.display = show ? 'block' : 'none';
+    });
+}
+
+// Functie de sortare
+function sorteaza(ascendent = true) {
+    const produseElems = Array.from(document.querySelectorAll('.produs-card'));
+    
+    produseElems.sort((a, b) => {
+        const idA = parseInt(a.id.replace('artc-', ''));
+        const idB = parseInt(b.id.replace('artc-', ''));
+        
+        // Cautam produsele in array-ul original
+        const prodA = produseDate.find(p => p.id === idA);
+        const prodB = produseDate.find(p => p.id === idB);
+        
+        if (!prodA || !prodB) return 0;
+        
+        // Sortare dupa nume
+        const cmpNume = prodA.nume.localeCompare(prodB.nume);
+        if (cmpNume !== 0) return ascendent ? cmpNume : -cmpNume;
+        
+        // Sortare dupa raport caracteristica_numerica/pret
+        const raportA = prodA.caracteristica_numerica / prodA.pret;
+        const raportB = prodB.caracteristica_numerica / prodB.pret;
+        return ascendent ? raportA - raportB : raportB - raportA;
+    });
+    
+    const grid = document.querySelector('.produse-grid');
+    produseElems.forEach(el => grid.appendChild(el));
+}
+
+// Functie de calculare
+function calculeaza() {
+    const visibleProduse = produseDate.filter(p => {
+        const elem = document.getElementById('artc-' + p.id);
+        return elem && elem.style.display !== 'none';
+    });
+    
+    if (visibleProduse.length === 0) {
+        alert('Nu există produse vizibile pentru calcul!');
+        return;
+    }
+    
+    const preturi = visibleProduse.map(p => p.pret);
+    const suma = preturi.reduce((a, b) => a + b, 0);
+    const media = suma / preturi.length;
+    const min = Math.min(...preturi);
+    const max = Math.max(...preturi);
+    
+    // Creare element rezultat
+    if (rezultatCalcul) rezultatCalcul.remove();
+    
+    rezultatCalcul = document.createElement('div');
+    rezultatCalcul.className = 'rezultat-calcul';
+    rezultatCalcul.innerHTML = `
+        <strong>Rezultate calcul (produse vizibile: ${visibleProduse.length}):</strong><br>
+        Sumă prețuri: ${suma.toFixed(2)} Lei<br>
+        Media prețurilor: ${media.toFixed(2)} Lei<br>
+        Preț minim: ${min.toFixed(2)} Lei<br>
+        Preț maxim: ${max.toFixed(2)} Lei
+    `;
+    document.body.appendChild(rezultatCalcul);
+    
+    // Dispare dupa 2 secunde
+    setTimeout(() => {
+        if (rezultatCalcul) {
+            rezultatCalcul.remove();
+            rezultatCalcul = null;
+        }
+    }, 2000);
+}
+
+// Functie de resetare
+function reseteaza() {
+    if (!confirm('Sigur vrei să resetezi filtrele?')) return;
+    
+    document.getElementById('filtru-descriere').value = '';
+    document.getElementById('filtru-nume').value = '';
+    document.getElementById('filtru-pret').value = 300;
+    document.getElementById('pret-valoare').textContent = '(0 - 300)';
+    document.getElementById('filtru-culoare').value = '';
+    document.querySelector('input[name="categorie"][value="toate"]').checked = true;
+    document.getElementById('filtru-noutati').checked = false;
+    document.getElementById('filtru-subcategorie').value = 'oricare';
+    
+    // Afiseaza toate produsele
+    document.querySelectorAll('.produs-card').forEach(el => {
+        el.style.display = 'block';
+    });
+    
+    // Reseteaza ordinea la cea initiala
+    const grid = document.querySelector('.produse-grid');
+    const produseElems = Array.from(document.querySelectorAll('.produs-card')).sort((a, b) => {
+        const idA = parseInt(a.id.replace('artc-', ''));
+        const idB = parseInt(b.id.replace('artc-', ''));
+        return idA - idB;
+    });
+    produseElems.forEach(el => grid.appendChild(el));
+}
+
+// Event listeners
+document.getElementById('btn-filtreaza').addEventListener('click', filtreaza);
+document.getElementById('btn-sort-asc').addEventListener('click', () => sorteaza(true));
+document.getElementById('btn-sort-desc').addEventListener('click', () => sorteaza(false));
+document.getElementById('btn-calcula').addEventListener('click', calculeaza);
+document.getElementById('btn-reset').addEventListener('click', reseteaza);
+
+// Update valoare range
+document.getElementById('filtru-pret').addEventListener('input', function() {
+    document.getElementById('pret-valoare').textContent = '(0 - ' + this.value + ')';
+});
+</script>
+
+</body>
+</html>

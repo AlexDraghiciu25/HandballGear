@@ -9,7 +9,9 @@
   
   <% if (locals.cssGalerieAnimata) { %>
     <style>
+        <% /* eslint-disable */ %>
         <%- cssGalerieAnimata %>
+        <% /* eslint-enable */ %>
     </style>
   <% } %>
 </head>
@@ -132,7 +134,7 @@
       <h2>
         <i class="fa-solid fa-tags"></i> 
         Promoții și oferte 
-        <i class="fa-solid fa-star fa-beat" style="color: var(--culoare-highlight);"></i>
+        <i class="fa-solid fa-star fa-beat" style="color: var(--culoare-highlight)";></i>
       </h2>
 
       <article>
