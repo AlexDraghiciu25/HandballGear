@@ -1,57 +1,87 @@
 $nr-imagini: 6 !default; 
-$timp-per-imagine: 3s; 
-$durata-totala: $nr-imagini * $timp-per-imagine;
 
-.galerie-animata {
-    width: 500px;
-    height: 350px;
+// Setările de timp (FĂRĂ unitatea "s" pentru a nu da eroare la compilare SASS)
+$hold-time: 2.5;      
+$transition-time: 1;  
+$cycle-time: $hold-time + $transition-time; 
+$total-time: $nr-imagini * $cycle-time;
+
+.animated-gallery-wrapper {
+    margin: 3rem auto;
+
+    @media (max-width: 1023px) { 
+        display: none;
+    }
+}
+
+/* --- MAIN CONTAINER --- */
+.gallery-container {
+    width: 100%;
+    max-width: 900px; 
+    height: 500px;
+    margin: 0 auto;
+    overflow: hidden; 
     position: relative;
-    overflow: hidden;
-    margin: 40px auto;
-    border: 15px solid transparent;
-    border-image: url('/resurse/imagini/fundal-duotone.png') 30 round; 
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    
+    /* Bordură groasă, solidă, culoare albastru închis */
+    border: 15px solid #0B3D91; 
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 
-    &:hover .galerie-item {
+    /* Pause pe hover */
+    &:hover .slider-track {
         animation-play-state: paused;
     }
-
-    @media (max-width: 991px) { display: none; }
 }
 
-.galerie-item {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    opacity: 0;
-    z-index: 0;
-    margin: 0;
-    animation: animatieComplexa $durata-totala infinite linear;
+/* --- SLIDER TRACK --- */
+.slider-track {
+    display: flex;
+    width: calc(100% * #{$nr-imagini}); 
+    height: 100%;
+    // Adaugam secunda "s" direct aici
+    animation: slide-horizontal #{$total-time}s infinite ease-in-out;
+}
 
-    img { width: 100%; height: 100%; object-fit: cover; }
-    figcaption {
-        position: absolute; bottom: 0; width: 100%;
-        background: rgba(0, 0, 0, 0.7); color: white; text-align: center; padding: 5px 0;
+/* --- SLIDE ITEM --- */
+.slide {
+    width: calc(100% / #{$nr-imagini}); 
+    flex-shrink: 0;                     
+    position: relative;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .caption {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background-color: #ffffff;      
+        color: #000000;                 
+        text-align: center;
+        padding: 15px 0;                
+        font-weight: bold;
+        font-size: 1.1rem;
     }
 }
 
-@for $i from 1 through $nr-imagini {
-    .galerie-item:nth-child(#{$i}) {
-        animation-delay: ($i - 1) * $timp-per-imagine;
+/* --- LOGICA ANIMAȚIEI MULTI-SLIDE --- */
+@keyframes slide-horizontal {
+    @for $i from 0 through ($nr-imagini - 1) {
+        // SASS va calcula procentul perfect, fără erori de unitate
+        $start-hold: ($i * $cycle-time / $total-time) * 100%;
+        $end-hold: (($i * $cycle-time + $hold-time) / $total-time) * 100%;
+        
+        // Glisează și stă pe loc
+        #{$start-hold} { transform: translateX(calc(-100% / #{$nr-imagini} * #{$i})); }
+        #{$end-hold} { transform: translateX(calc(-100% / #{$nr-imagini} * #{$i})); }
     }
-}
-
-$p: 100% / $nr-imagini; // Procentul ocupat de o poză din timeline-ul total
-
-@keyframes animatieComplexa {
-    0% { opacity: 1; z-index: 10; transform: translateX(0); }
-    // 1. Glisare la dreapta
-    #{ $p * 0.3 } { transform: translateX(25%); opacity: 1; }
-    // 2. Glisare la stânga
-    #{ $p * 0.6 } { transform: translateX(-25%); opacity: 1; }
-    // 3. Ieșire la dreapta + opacitate 0
-    #{ $p * 0.9 } { transform: translateX(100%); opacity: 0; z-index: 10; }
-    // Final de ciclu pentru poza curentă
-    #{ $p } { transform: translateX(0); opacity: 0; z-index: 0; }
-    100% { opacity: 0; }
+    
+    100% {
+        transform: translateX(0);
+    }
 }

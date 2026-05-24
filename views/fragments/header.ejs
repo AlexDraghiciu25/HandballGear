@@ -43,6 +43,19 @@
         <div class="imag-icon"><span class="fas fa-solid fa-cart-shopping"></span></div>
       </li>
 
+      <li class="nav-item d-flex align-items-center ms-2">
+        <div class="d-flex align-items-center gap-1">
+            <i class="bi bi-palette-fill" id="icon-tema" style="font-size:1.2rem;"></i>
+            <select id="select-tema" class="form-select form-select-sm" style="width:auto; min-width:100px;">
+                <option value="light">☀️ Light</option>
+                <option value="dark">🌙 Dark</option>
+                <option value="ocean">🌊 Ocean</option>
+                <option value="forest">🌲 Forest</option>
+                <option value="sunset">🌅 Sunset</option>
+            </select>
+        </div>
+      </li>
+
       <li>
         <div class="imag-icon"><i class="fa-solid fa-list"></i> </div>
         <div class="text-icon"><a href="/index#categorii">Categorii</a></div>       
@@ -57,18 +70,20 @@
 
       <li><a href="/despre"><i class="fa-solid fa-info-circle"></i> Despre noi</a></li>
       <li><a href="/contact"><i class="fa-regular fa-envelope"></i> Contact</a></li>
+      
       <li>
         <div class="text-icon"><a href="/produse">Produse</a></div>
         <div class="imag-icon"><i class="fa-solid fa-box-open"></i></div>
         <ul>
-          <li><a href="/produse?categorie=toate">Toate produsele</a></li>
-          <li><a href="/produse?categorie=Mingi">Mingi</a></li>
-          <li><a href="/produse?categorie=Adidasi">Adidași</a></li>
-          <li><a href="/produse?categorie=Accesorii">Accesorii</a></li>
-          <li><a href="/produse?categorie=Protectie">Protecție</a></li>
-          <li><a href="/produse?categorie=Echipament">Echipament</a></li>
+          <li><a href="/produse">Toate produsele</a></li>
+          <% if (locals.categorii) { %>
+            <% for(let categ of categorii) { %>
+              <li><a href="/produse?categorie=<%- categ %>"><%- categ %></a></li>
+            <% } %>
+          <% } %>
         </ul>
       </li>
+
     </ul>
   </nav>
 
@@ -90,3 +105,35 @@
     </figure>
   </section>
 </header>
+
+<script>
+// Script pentru Teme Multiple (Bonus 2) - salvare in localStorage
+document.addEventListener("DOMContentLoaded", function() {
+    const selectTema = document.getElementById("select-tema");
+    
+    // Verificăm ce e salvat în localStorage
+    let temaCurenta = localStorage.getItem("tema_site") || "light";
+    
+    // Aplicăm tema salvată
+    if (temaCurenta && temaCurenta !== "light") {
+        document.documentElement.setAttribute("data-theme", temaCurenta);
+        document.body.setAttribute("data-theme", temaCurenta);
+    }
+    if (selectTema) selectTema.value = temaCurenta;
+
+    // La schimbarea select-ului
+    if (selectTema) {
+        selectTema.addEventListener("change", function() {
+            let temaNoua = this.value;
+            if (temaNoua === "light") {
+                document.documentElement.removeAttribute("data-theme");
+                document.body.removeAttribute("data-theme");
+            } else {
+                document.documentElement.setAttribute("data-theme", temaNoua);
+                document.body.setAttribute("data-theme", temaNoua);
+            }
+            localStorage.setItem("tema_site", temaNoua);
+        });
+    }
+});
+</script>

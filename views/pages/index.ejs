@@ -6,23 +6,34 @@
   <meta name="keywords" content="handball, echipament, minge, adidasi, clister, cotiera">
 
   <%- include("../fragments/head.ejs") %>
-  
-  <% if (locals.cssGalerieAnimata) { %>
-    <style>
-        <% /* eslint-disable */ %>
-        <%- cssGalerieAnimata %>
-        <% /* eslint-enable */ %>
-    </style>
-  <% } %>
+  <%- locals.cssGalerieAnimata ? '<style>' + locals.cssGalerieAnimata + '</style>' : '' %>
 </head>
 
 <body id="top">
-
 <div id="watermark-print">Draghiciu<br>Alexandru</div>
-
 <%- include("../fragments/header.ejs") %>
 
 <main>
+  <!-- Identificator: galerie-animata -->
+  <section id="galerie-animata-section" class="animated-gallery-wrapper container">
+    <h2 class="text-center mb-4">Galerie Animată</h2>
+    <% if (locals.imaginiAnimate && imaginiAnimate.length > 0) { %>
+      <div class="gallery-container">
+        <div class="slider-track">
+          <% imaginiAnimate.forEach(function(img) { %>
+              <div class="slide">
+                  <% let caleCurata = '/' + caleBaza.replace(/^\/+/, '') + (caleBaza.endsWith('/') ? '' : '/') + img.cale_imagine.replace(/^\/+/, ''); %>
+                  <img src="<%- caleCurata %>" alt="<%- img.titlu %>">
+                  <div class="caption"><%- img.titlu %></div>
+              </div>
+          <% }); %>
+        </div>
+      </div>
+    <% } else { %>
+      <p class="text-center my-5">Nu sunt imagini disponibile pentru galeria animată conform filtrării orare.</p>
+    <% } %>
+  </section>
+
   <section id="hero-duotone">
       <div class="efect-duotone"></div>
   </section>
@@ -370,27 +381,55 @@
   </section>
 
   <section id="galerie-statica">
-    <h2>Galerie Foto (Statică)</h2>
-    <%- include('../fragments/galerie-statica') %>
-  </section>
+    <h2>Galerie</h2>
 
-  <section id="galerie-animata" class="galerie-animata">
-    <h2>Galerie Animată</h2>
-    <div class="galerie-container">
-        <% if (locals.imaginiAnimate && imaginiAnimate.length > 0) { %>
-            <% imaginiAnimate.forEach(function(img) { %>
-                <figure class="galerie-item">
-                    <img src="<%- caleBaza %><%- img.cale_imagine %>" alt="<%- img.titlu %>">
-                    <figcaption><%- img.titlu %></figcaption>
-                </figure>
-            <% }); %>
-        <% } else { %>
-            <p style="text-align: center;">Nu sunt imagini disponibile pentru animație conform filtrării orare.</p>
-        <% } %>
+    <div id="grid-galerie">
+      <figure>
+        <picture>
+          <source srcset="/resurse/imagini/echipamente-320p.png" media="(max-width:700px)">
+          <source srcset="/resurse/imagini/echipamente-768p.png" media="(max-width:1200px)">
+          <img 
+            src="/resurse/imagini/echipamente-1280p.png"
+            alt="Echipament de handbal"
+            title="Echipament handbal"
+            loading="lazy">
+        </picture>
+        <figcaption>Echipament</figcaption>
+      </figure>
+
+      <figure>
+        <picture>
+          <source srcset="/resurse/imagini/antrenamente-320p.png" media="(max-width:700px)">
+          <source srcset="/resurse/imagini/antrenamente-768p.png" media="(max-width:1200px)">
+          <img 
+            src="/resurse/imagini/antrenamente-1280p.png"
+            alt="Antrenament de handbal"
+            title="Antrenament handbal"
+            loading="lazy">
+        </picture>
+        <figcaption>Antrenament</figcaption>
+      </figure>
+
+      <figure>
+        <picture>
+          <source srcset="/resurse/imagini/indoor-320p.jpeg" media="(max-width:700px)">
+          <source srcset="/resurse/imagini/indoor-768p.jpeg" media="(max-width:1200px)">
+          <img src="/resurse/imagini/indoor-1280p.jpeg"
+              alt="Pantofi indoor pentru handbal"
+              title="Pantofi indoor handbal">
+        </picture>
+        <figcaption>Indoor</figcaption>
+      </figure>
     </div>
   </section>
 
-  <section id="zone-echipament" class="container mt-5 mb-5">
+  <!-- ACEASTA ESTE GALERIA TA STATICA GENERATĂ DIN JSON (CEA CU a, b, c ȘI ORE) -->
+  <section id="galerie-statica-json" class="container-galerie mt-5 mb-5">
+    <h2 class="text-center">Galerie Foto (Statică din JSON)</h2>
+    <%- include('../fragments/galerie-statica') %>
+  </section>
+
+  <section id="zone-echipament">
       <h3>Zone echipament handbal</h3>
 
       <picture>
@@ -408,7 +447,7 @@
         <area shape="rect" coords="700,750,850,950" href="/genunchere" alt="Genunchere" title="Genuncheră (protecție)">
         <area shape="rect" coords="500,800,650,1050" href="/adidasi" alt="Adidasi" title="Adidași indoor">
       </map>
-  </section>
+    </section>
 
 </main>
 

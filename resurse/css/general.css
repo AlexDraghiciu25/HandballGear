@@ -687,6 +687,14 @@ img, video, iframe, object {
     transition: all 0.3s ease;
 }
 
+.btn-tab::before {
+    content: "\f144"; /* Iconita Play (FontAwesome) */
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
+
 .btn-tab:hover {
     background-color: var(--culoare-tab-hover); 
     color: var(--culoare-alb);            
@@ -716,8 +724,14 @@ img, video, iframe, object {
     transform: rotate(360deg); transition: background-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
 }
 #sageata {
-    color: var(--culoare-principala); font-size: 2rem; font-weight: bold; display: inline-block;
+    color: var(--culoare-principala); font-size: 0; font-weight: bold; display: inline-block;
     transform: scale(1); transition: transform 0.4s ease, color 0.4s ease;
+}
+#sageata::before {
+    content: "\f062"; /* Iconita sageata sus (fa-arrow-up) */
+    font-size: 2rem;
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
+    font-weight: 900;
 }
 #link-top:hover #triunghi { background-color: var(--culoare-border); }
 #link-top:hover #sageata { color: var(--culoare-sageata-hover); transform: scale(1.4); }
@@ -1031,8 +1045,11 @@ a:visited {
 
 /* 2. Linkuri EXTERNE (care incep cu http) */
 a[href^="http"]::before {
-    content: "⮳ "; /* Simbolul cerut */
-    font-size: 1.5em; /* 50% mai mare folosind unitate relativa */
+    content: "\f35d"; /* fa-external-link-alt */
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 1.2em; /* Ajustat pentru a arata elegant langa text */
+    margin-right: 5px;
     display: inline-block;
     transition: color 0.3s ease;
 }
@@ -1143,7 +1160,8 @@ main a:active {
 /* Indexare literala a imaginilor in descriere (a, b, c...) */
 .galerie-statica figcaption::before {
     counter-increment: myIndex;
-    content: counter(myIndex, lower-alpha) ") ";
+    content: "\f03e  " counter(myIndex, lower-alpha) ") "; /* Iconita de imagine langa litera */
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "Madimi One", Arial, sans-serif;
     font-weight: bold;
 }
 

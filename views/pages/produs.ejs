@@ -1,76 +1,150 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <title><%= produs.nume %> - Handball Gear</title>
-  <meta name="description" content="<%= produs.descriere %>">
-  <meta name="keywords" content="handball, echipament, <%= produs.nume %>, <%= produs.categorie_mare %>">
+    <%- include('../fragments/head.ejs') %>
+    <title>HandballGear - <%= produs.nume %></title>
+    <style>
+        .produs-unic-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
 
-  <%- include("../fragments/head.ejs") %>
-  <link rel="stylesheet" href="/resurse/css/produs.css">
+        .produs-imagine {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .produs-imagine img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            padding: 10px;
+        }
+
+        .produs-detalii {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .produs-detalii h1 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        .pret-mare {
+            font-size: 2em;
+            color: #28a745;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .tabel-specificatii {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .tabel-specificatii th, .tabel-specificatii td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tabel-specificatii th {
+            width: 40%;
+            background-color: #f8f9fa;
+            color: #555;
+        }
+
+        .btn-inapoi {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .btn-inapoi:hover {
+            background-color: #5a6268;
+        }
+    </style>
 </head>
+<body>
+    <%- include('../fragments/header.ejs') %>
 
-<body id="top">
+    <main>
+        <div class="produs-unic-container">
+            <div class="produs-imagine">
+                <img src="<%= produs.imagine %>" alt="Imagine <%= produs.nume %>">
+            </div>
 
-<div id="watermark-print">Draghiciu<br>Alexandru</div>
+            <div class="produs-detalii">
+                <h1><%= produs.nume %></h1>
+                <div class="pret-mare"><%= produs.pret %> RON</div>
+                
+                <p><strong>Descriere completă:</strong><br> <%= produs.descriere %></p>
 
-<%- include("../fragments/header.ejs") %>
+                <table class="tabel-specificatii">
+                    <tbody>
+                        <tr>
+                            <th>ID Produs în Baza de Date</th>
+                            <td>#<%= produs.id %></td>
+                        </tr>
+                        <tr>
+                            <th>Categorie Principală</th>
+                            <td><%= produs.categorie_mare %></td>
+                        </tr>
+                        <tr>
+                            <th>Subcategorie</th>
+                            <td><%= produs.subcategorie %></td>
+                        </tr>
+                        <tr>
+                            <th>Culoare predominantă</th>
+                            <td><%= produs.culoare %></td>
+                        </tr>
+                        <tr>
+                            <th>Greutate / Valoare numerică</th>
+                            <td><%= produs.caracteristica_numerica %> unități</td>
+                        </tr>
+                        <tr>
+                            <th>Caracteristici Multiplă</th>
+                            <td><%= produs.caracteristici_multi.split(',').join(', ') %></td>
+                        </tr>
+                        <tr>
+                            <th>Data adăugării în magazin</th>
+                            <td><%= formateazaData(produs.data_intrare) %></td>
+                        </tr>
+                        <tr>
+                            <th>Este Noutate?</th>
+                            <td>
+                                <% if (produs.este_noutate === 1 || produs.este_noutate === true) { %>
+                                    <span style="color: green; font-weight: bold;">Da - Produs Nou!</span>
+                                <% } else { %>
+                                    Nu
+                                <% } %>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-<main>
-  <section class="container mt-5">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/">Acasă</a></li>
-        <li class="breadcrumb-item"><a href="/produse">Produse</a></li>
-        <li class="breadcrumb-item"><a href="/produse?categorie=<%= produs.categorie_mare %>"><%= produs.categorie_mare %></a></li>
-        <li class="breadcrumb-item active" aria-current="page"><%= produs.nume %></li>
-      </ol>
-    </nav>
-
-    <article id="produs-detalii" class="produs-unic">
-      <h1><%= produs.nume %></h1>
-      
-      <div class="produs-layout">
-        <!-- Prima coloana: imagine -->
-        <div class="coloana-img">
-          <img src="<%= produs.imagine %>" alt="<%= produs.nume %>">
+                <a href="/produse" class="btn-inapoi"><i class="fa-solid fa-arrow-left"></i> Înapoi la toate produsele</a>
+            </div>
         </div>
-        
-        <!-- A doua coloana: toate detaliile -->
-        <div class="coloana-detalii">
-          <p class="categorie"><strong>Categorie:</strong> <%= produs.categorie_mare %></p>
-          <p class="subcategorie"><strong>Subcategorie:</strong> <%= produs.subcategorie %></p>
-          <p class="pret"><strong>Preț:</strong> <span class="pret-valoare"><%= produs.pret %> Lei</span></p>
-          
-          <hr>
-          
-          <h3>Caracteristici complete:</h3>
-          <ul class="caracteristici-complete">
-            <li><strong>ID Produs:</strong> <%= produs.id %></li>
-            <li><strong>Greutate:</strong> <%= produs.caracteristica_numerica %>g</li>
-            <li><strong>Culoare:</strong> <%= produs.culoare %></li>
-            <li><strong>Caracteristici disponibile:</strong> <%= produs.caracteristici_multi %></li>
-            <li><strong>Data intrării în ofertă:</strong> <time datetime="<%= produs.data_intrare %>"><%= new Date(prod.data_intrare).toLocaleDateString('ro-RO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) %></time></li>
-            <li><strong>Produs nou:</strong> <%= produs.este_noutate ? 'Da' : 'Nu' %></li>
-          </ul>
-          
-          <hr>
-          
-          <h3>Descriere completă:</h3>
-          <p class="descriere-completa"><%= produs.descriere %></p>
-          
-          <div class="actiuni">
-            <button class="btn btn-primary btn-lg">
-              <i class="fa-solid fa-cart-shopping"></i> Adaugă în coș
-            </button>
-            <a href="/produse" class="btn btn-outline-secondary">Înapoi la produse</a>
-          </div>
-        </div>
-      </div>
-    </article>
-  </section>
-</main>
+    </main>
 
-<%- include("../fragments/footer.ejs") %>
-
+    <%- include('../fragments/footer.ejs') %>
 </body>
 </html>

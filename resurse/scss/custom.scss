@@ -1,3 +1,18 @@
+// --- CUSTOMIZĂRI BOOTSTRAP PENTRU BUTOANE ---
+$btn-border-radius: 0.8rem; // Rază mai mare, din cerință
+$btn-border-width: 3px;     // Border mai gros
+
+// --- CUSTOMIZĂRI PENTRU INPUT RANGE (Cerință specifică) ---
+// Bulina cu 50% mai mare (de obicei e 1rem, noi o facem 1.5rem)
+$form-range-thumb-width: 1.5rem;
+$form-range-thumb-height: 1.5rem;
+// Culori custom pentru slider
+$form-range-thumb-bg: #ff6b6b; // Un roșu plăcut
+$form-range-track-bg: #808080; // Un gri pentru bara din spate
+
+// Importăm tot Bootstrap-ul (asigură-te că ai instalat pachetul 'bootstrap' în node_modules)
+// Dacă nu îți compilează corect calea, folosește calea completă către fișierul tău bootstrap.scss
+
 /* ========================================================= */
 /* 1. SUPRASCRIEREA VARIABILELOR BOOTSTRAP (Cerința ta)     */
 /* ========================================================= */
@@ -271,24 +286,6 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
     }
 }
 
-// Selecție text (0.025p)
-::selection { background-color: $primary; color: white; }
-
-// Text pe coloane (0.025p)
-.text-coloane {
-    column-count: 1;
-    @media (min-width: 1024px) { column-count: 3; column-rule: 2px solid $primary; }
-}
-
-// Text animat (0.05p)
-.container-marquee {
-    width: 100%; overflow: hidden; background: $secondary; color: white; padding: 10px 0;
-}
-.text-marquee {
-    display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite;
-}
-@keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-
 /* ========================================================= */
 /* 5. STILIZARE HR (Identificator: efect-css-stilizare-hr)   */
 /* ========================================================= */
@@ -303,7 +300,9 @@ hr {
 
   /* Simbolul din STÂNGA (::before) */
   &::before {
-    content: "\2605";               /* Caracter Unicode pentru stea plină */
+    content: "\f005";               /* FontAwesome Solid Star */
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
+    font-weight: 900;
     position: absolute;
     left: 20%;                      /* Poziționare la 20% din lungime */
     top: 50%;
@@ -318,7 +317,9 @@ hr {
 
   /* Simbolul din DREAPTA (::after) */
   &::after {
-    content: "\2605";               /* Caracter Unicode pentru stea plină */
+    content: "\f005";               /* FontAwesome Solid Star */
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
+    font-weight: 900;
     position: absolute;
     right: 20%;                     /* Poziționare la 20% de marginea din dreapta */
     top: 50%;
@@ -337,4 +338,159 @@ hr {
     color: $primary;
     cursor: crosshair;
   }
+}
+
+/* ========================================================= */
+/* 4. TEME MULTIPLE (Light, Dark, Ocean, Forest, Sunset)     */
+/* ========================================================= */
+:root {
+    --text-principal: #2d3748;
+    --bg-principal: #f7fafc; /* Un gri extrem de deschis pentru margini (Light) */
+    --card-bg: #ffffff;      /* Alb curat pentru cutii (Light) */
+    --border-card: #e2e8f0;
+    --accent-color: #{$primary};
+}
+
+[data-theme="dark"] {
+    --text-principal: #f1f5f9;
+    --bg-principal: #0f172a; /* Slate Dark modern */
+    --card-bg: #1e293b;
+    --border-card: #334155;
+    --accent-color: #ff8533;
+}
+
+[data-theme="ocean"] {
+    --text-principal: #e0f2fe;
+    --bg-principal: #0c4a6e;
+    --card-bg: #075985;
+    --border-card: #0369a1;
+    --accent-color: #38bdf8;
+}
+
+[data-theme="forest"] {
+    --text-principal: #ecfdf5;
+    --bg-principal: #14532d;
+    --card-bg: #166534;
+    --border-card: #15803d;
+    --accent-color: #4ade80;
+}
+
+[data-theme="sunset"] {
+    --text-principal: #fef3c7;
+    --bg-principal: #7c2d12;
+    --card-bg: #9a3412;
+    --border-card: #c2410c;
+    --accent-color: #fb923c;
+}
+
+/* 1. Forțăm marginile și întregul site să se schimbe (Aici era problema ta cu marginile albe!) */
+html, body, main {
+    background-color: var(--bg-principal) !important;
+    color: var(--text-principal) !important;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* 2. Cutiile din mijloc (Containere, secțiuni, filtre, produse) */
+.produs, .panou-filtre, section#test, .c1, .container, article {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-card) !important;
+    color: var(--text-principal) !important;
+    border-radius: 12px; /* Margini finuțe */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Umbră subtilă ca să iasă în relief */
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* 3. Textul general să fie vizibil mereu */
+h1, h2, h3, h4, h5, h6, p, label {
+    color: var(--text-principal);
+}
+
+/* Exceptăm butoanele ca să nu li se strice culorile de la Bootstrap */
+.btn, .btn span, .btn i, .form-check-label i {
+    color: inherit;
+}
+
+/* ========================================= */
+/* --- STILURI PENTRU GALERIA STATICA --- */
+/* ========================================= */
+
+.container-galerie {
+    width: 100%;
+    padding: 20px 0;
+    overflow: hidden;
+}
+
+.galerie-statica {
+    /* Counter pentru indexare figcaption (a, b, c...) */
+    counter-reset: myIndex;
+    
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr;
+    max-width: 900px; /* Limitam latimea pentru un aspect mai elegant */
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.galerie-statica figure {
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    height: 250px; /* Forțăm o înălțime fixă ca să nu mai fie pozele lungi */
+}
+
+/* Stilizare Imagini */
+.galerie-statica picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Face ca poza să taie marginile frumos în loc să se turtească */
+    display: block;
+    border-radius: 8px;
+    
+    /* Cerinta: Tranzitie de 1.25 secunde, pastrand granita de jos aliniata */
+    transition: transform 1.25s ease;
+    transform-origin: bottom center;
+}
+
+/* EFECTUL LA HOVER PE IMAGINE */
+.galerie-statica figure:hover picture img {
+    /* Mareste cu 30% si ridica usor */
+    transform: scale(1.3);
+}
+
+/* Stilizare Descriere (Figcaption) */
+.galerie-statica figcaption {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    transition: background-color 1.25s ease, color 1.25s ease;
+}
+
+.galerie-statica figure:hover figcaption {
+    /* Schimbam culoarea de text si background la hover */
+    background-color: rgba(255, 102, 0, 0.9); /* Portocaliu Handbal */
+    color: #111;
+}
+
+/* Indexare literala a imaginilor in descriere (a, b, c...) */
+.galerie-statica figcaption::before {
+    counter-increment: myIndex;
+    content: "\f03e  " counter(myIndex, lower-alpha) ") "; /* Iconita de imagine langa litera */
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "Madimi One", Arial, sans-serif;
+    font-weight: bold;
+}
+
+/* --- RESPONSIVITATE GRID --- */
+@media screen and (min-width: 577px) and (max-width: 991px) {
+    .galerie-statica { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media screen and (min-width: 992px) {
+    .galerie-statica { grid-template-columns: repeat(4, 1fr); grid-auto-rows: 200px; }
+    .galerie-statica figure:nth-child(6) { grid-column: 4; }
 }
