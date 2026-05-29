@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <title>Seturi de Produse - Handball Gear</title>
+    <meta name="description" content="Seturi de produse handbal la prețuri reduse: pachete portar, antrenament, competiție.">
+    <%- include("../fragments/head.ejs") %>
+    <link rel="stylesheet" href="/resurse/css/custom.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body id="top">
+    <div id="watermark-print">Draghiciu<br>Alexandru</div>
+    <%- include("../fragments/header.ejs") %>
+
+    <main class="container py-5">
+        <h1 class="text-center mb-5"><i class="bi bi-box-seam-fill"></i> Seturi de Produse</h1>
+        <p class="text-center mb-5 lead">Cumpără un set complet și beneficiezi de reduceri automate! Cu cât sunt mai multe produse în set, cu atât reducerea este mai mare.</p>
+
+        <% if (seturi && seturi.length > 0) { %>
+            <% for (let set of seturi) { %>
+                <div class="card mb-4 shadow" style="background-color: var(--card-bg); border-color: var(--border-card); color: var(--text-principal);">
+                    <div class="card-header" style="background: var(--accent-color, #ff6600); color: white;">
+                        <h3 class="mb-0"><i class="bi bi-gift-fill"></i> <%= set.nume %></h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text mb-3"><%= set.descriere %></p>
+
+                        <div class="row g-3 mb-3">
+                            <% for (let prod of set.produse) { %>
+                                <div class="col-6 col-md-3 text-center">
+                                    <a href="/produs/<%= prod.id %>" style="text-decoration:none; color:inherit;">
+                                        <img src="<%= prod.imagine %>" alt="<%= prod.nume %>" 
+                                             class="img-fluid rounded mb-2" 
+                                             style="max-height:100px; object-fit:contain; border:1px solid var(--border-card);">
+                                        <p class="mb-0 fw-bold" style="font-size:0.85em;"><%= prod.nume %></p>
+                                        <p class="text-muted" style="font-size:0.8em;"><%= prod.pret %> RON</p>
+                                    </a>
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background:rgba(0,0,0,0.05);">
+                            <div>
+                                <span class="text-muted" style="text-decoration:line-through; font-size:1.1em;"><%= set.pret_original %> RON</span>
+                                <span class="badge bg-danger ms-2">-<%= set.reducere %>%</span>
+                            </div>
+                            <div>
+                                <span class="fw-bold" style="font-size:1.4em; color:var(--accent-color, #ff6600);"><%= set.pret_final %> RON</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        <% } else { %>
+            <div class="text-center p-5">
+                <i class="bi bi-emoji-frown" style="font-size:3rem;"></i>
+                <p class="mt-3">Nu există seturi de produse în acest moment.</p>
+            </div>
+        <% } %>
+    </main>
+
+    <%- include("../fragments/footer.ejs") %>
+</body>
+</html>

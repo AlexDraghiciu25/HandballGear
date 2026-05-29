@@ -1,0 +1,22 @@
+{
+  "oferte": [
+    {
+      "categorie": "Adidasi",
+      "data-incepere": "2026-05-29T14:52:05.810Z",
+      "data-finalizare": "2026-05-29T14:54:05.810Z",
+      "reducere": 25
+    },
+    {
+      "categorie": "Mingi",
+      "data-incepere": "2026-05-29T14:50:05.793Z",
+      "data-finalizare": "2026-05-29T14:52:05.793Z",
+      "reducere": 50
+    },
+    {
+      "categorie": "Echipament",
+      "data-incepere": "2026-05-29T14:46:06.177Z",
+      "data-finalizare": "2026-05-29T14:48:06.177Z",
+      "reducere": 25
+    }
+  ]
+}

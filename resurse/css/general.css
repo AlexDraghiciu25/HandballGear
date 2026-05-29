@@ -1177,17 +1177,11 @@ main a:active {
 /* Ecran Mare (Laptop/Desktop - 4 coloane 3 randuri cu spații libere) */
 @media screen and (min-width: 992px) {
     .galerie-statica {
-        /* Setăm 4 coloane */
         grid-template-columns: repeat(4, 1fr);
         
-        /* Înălțime fixă pentru poze (am pus 200px ca să arate perfect pe 4 coloane) */
         grid-auto-rows: 200px; 
     }
     
-    /* MAGIA PENTRU SPAȚIILE ALBE (Rândul 2, Coloanele 2 și 3) */
-    /* Primele 4 imagini ocupă Rândul 1 complet.
-       Imaginea a 5-a se pune automat pe Rândul 2, Coloana 1.
-       Forțăm imaginea a 6-a să se ducă pe Coloana 4, sărind astfel peste coloanele 2 și 3! */
     .galerie-statica figure:nth-child(6) {
         grid-column: 4; 
     }

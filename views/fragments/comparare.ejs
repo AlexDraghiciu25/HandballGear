@@ -1,0 +1,163 @@
+<%# --- BONUS 20: Fragment EJS Comparare Produse --- %>
+<div id="container-comparare" style="display:none; position:fixed; bottom:20px; left:20px; z-index:9996; background:var(--card-bg, #fff); border:2px solid var(--accent-color, #ff6600); border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.3); padding:15px; min-width:280px; max-width:350px; color:var(--text-principal, #333);">
+    <h6 style="margin:0 0 10px 0; border-bottom:2px solid var(--accent-color, #ff6600); padding-bottom:8px;">
+        <i class="bi bi-arrow-left-right"></i> Comparare Produse
+    </h6>
+    <div id="comparare-lista"></div>
+    <button id="btn-afiseaza-comparare" class="btn btn-primary btn-sm w-100 mt-2" style="display:none;" onclick="afiseazaComparare()">
+        <i class="bi bi-eye-fill"></i> Afișează comparația
+    </button>
+</div>
+
+<script>
+// --- BONUS 20: Sistem complet de comparare produse ---
+const COMPARARE_KEY = 'comparare_produse';
+const COMPARARE_TIMESTAMP_KEY = 'comparare_timestamp';
+const EXPIRARE_ZILE = 1;
+
+function getComparare() {
+    let ts = localStorage.getItem(COMPARARE_TIMESTAMP_KEY);
+    if (ts) {
+        let diff = (Date.now() - parseInt(ts)) / (1000 * 60 * 60 * 24);
+        if (diff > EXPIRARE_ZILE) {
+            localStorage.removeItem(COMPARARE_KEY);
+            localStorage.removeItem(COMPARARE_TIMESTAMP_KEY);
+            return [];
+        }
+    }
+    try { return JSON.parse(localStorage.getItem(COMPARARE_KEY)) || []; }
+    catch(e) { return []; }
+}
+
+function setComparare(lista) {
+    localStorage.setItem(COMPARARE_KEY, JSON.stringify(lista));
+    localStorage.setItem(COMPARARE_TIMESTAMP_KEY, Date.now().toString());
+}
+
+function actualizeazaContainerComparare() {
+    let lista = getComparare();
+    let container = document.getElementById('container-comparare');
+    let listaDiv = document.getElementById('comparare-lista');
+    let btnAfiseaza = document.getElementById('btn-afiseaza-comparare');
+
+    if (lista.length === 0) {
+        container.style.display = 'none';
+        activButoaneleCompara(true);
+        return;
+    }
+
+    container.style.display = 'block';
+    listaDiv.innerHTML = '';
+
+    lista.forEach((prod, idx) => {
+        let div = document.createElement('div');
+        div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:5px 0; border-bottom:1px solid var(--border-card, #eee);';
+        div.innerHTML = `
+            <span style="font-size:0.9em; flex:1;">${prod.nume}</span>
+            <button class="btn btn-sm btn-outline-danger" onclick="stergeDinComparare(${idx})" title="Șterge din comparare">
+                <i class="bi bi-x"></i>
+            </button>
+        `;
+        listaDiv.appendChild(div);
+    });
+
+    if (lista.length >= 2) {
+        btnAfiseaza.style.display = 'block';
+        activButoaneleCompara(false);
+    } else {
+        btnAfiseaza.style.display = 'none';
+        activButoaneleCompara(true);
+    }
+}
+
+function adaugaLaComparare(id, nume) {
+    let lista = getComparare();
+    if (lista.length >= 2) return;
+    if (lista.find(p => p.id === id)) return;
+    lista.push({ id: id, nume: nume });
+    setComparare(lista);
+    actualizeazaContainerComparare();
+}
+
+function stergeDinComparare(index) {
+    let lista = getComparare();
+    lista.splice(index, 1);
+    setComparare(lista);
+    if (lista.length === 0) {
+        localStorage.removeItem(COMPARARE_KEY);
+        localStorage.removeItem(COMPARARE_TIMESTAMP_KEY);
+    }
+    actualizeazaContainerComparare();
+}
+
+function activButoaneleCompara(activ) {
+    document.querySelectorAll('.btn-compara').forEach(btn => {
+        if (activ) {
+            btn.disabled = false;
+            btn.title = 'Compară acest produs';
+            btn.classList.remove('btn-secondary');
+            btn.classList.add('btn-outline-info');
+        } else {
+            btn.disabled = true;
+            btn.title = 'Ștergeți un produs din lista de comparare';
+            btn.classList.remove('btn-outline-info');
+            btn.classList.add('btn-secondary');
+        }
+    });
+}
+
+function afiseazaComparare() {
+    let lista = getComparare();
+    if (lista.length < 2) return;
+
+    // Fetch ambele produse si deschide fereastra noua
+    Promise.all([
+        fetch('/api/produs/' + lista[0].id).then(r => r.json()),
+        fetch('/api/produs/' + lista[1].id).then(r => r.json())
+    ]).then(([p1, p2]) => {
+        let win = window.open('', '_blank', 'width=800,height=600');
+        if (!win) { alert('Permite popup-urile pentru a vedea comparația!'); return; }
+
+        let temaCurenta = localStorage.getItem('tema_site') || 'light';
+        let bgColor = temaCurenta === 'dark' ? '#0f172a' : (temaCurenta === 'ocean' ? '#0c4a6e' : (temaCurenta === 'forest' ? '#14532d' : (temaCurenta === 'sunset' ? '#7c2d12' : '#f7fafc')));
+        let textColor = temaCurenta === 'light' ? '#2d3748' : '#f1f5f9';
+        let cardBg = temaCurenta === 'dark' ? '#1e293b' : (temaCurenta === 'ocean' ? '#075985' : (temaCurenta === 'forest' ? '#166534' : (temaCurenta === 'sunset' ? '#9a3412' : '#ffffff')));
+
+        win.document.write(`<!DOCTYPE html><html><head><title>Comparare Produse</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <style>
+            body { font-family: 'Segoe UI', sans-serif; padding:30px; background:${bgColor}; color:${textColor}; }
+            h2 { text-align:center; margin-bottom:30px; }
+            table { width:100%; border-collapse:collapse; background:${cardBg}; border-radius:12px; overflow:hidden; }
+            th, td { padding:12px 15px; border:1px solid rgba(128,128,128,0.3); text-align:center; }
+            th { background:rgba(255,102,0,0.9); color:white; font-size:1.1em; }
+            td:first-child { font-weight:bold; text-align:left; width:30%; }
+            img { max-width:120px; border-radius:8px; }
+        </style></head><body>
+        <h2><i class="bi bi-arrow-left-right"></i> Comparare Produse</h2>
+        <table>
+            <thead><tr><th>Caracteristică</th><th>${p1.nume}</th><th>${p2.nume}</th></tr></thead>
+            <tbody>
+                <tr><td>Imagine</td><td><img src="${p1.imagine}" alt="${p1.nume}"></td><td><img src="${p2.imagine}" alt="${p2.nume}"></td></tr>
+                <tr><td>Preț</td><td>${p1.pret} RON</td><td>${p2.pret} RON</td></tr>
+                <tr><td>Categorie</td><td>${p1.categorie_mare}</td><td>${p2.categorie_mare}</td></tr>
+                <tr><td>Subcategorie</td><td>${p1.subcategorie}</td><td>${p2.subcategorie}</td></tr>
+                <tr><td>Culoare</td><td>${p1.culoare}</td><td>${p2.culoare}</td></tr>
+                <tr><td>Greutate</td><td>${p1.caracteristica_numerica} u.</td><td>${p2.caracteristica_numerica} u.</td></tr>
+                <tr><td>Caracteristici</td><td>${p1.caracteristici_multi}</td><td>${p2.caracteristici_multi}</td></tr>
+                <tr><td>Descriere</td><td><i>${p1.descriere}</i></td><td><i>${p2.descriere}</i></td></tr>
+                <tr><td>Noutate</td><td>${p1.este_noutate ? 'Da' : 'Nu'}</td><td>${p2.este_noutate ? 'Da' : 'Nu'}</td></tr>
+            </tbody>
+        </table></body></html>`);
+        win.document.close();
+    }).catch(err => {
+        console.error('Eroare la comparare:', err);
+        alert('Eroare la încărcarea datelor produselor!');
+    });
+}
+
+// Initializare la incarcarea paginii
+document.addEventListener('DOMContentLoaded', function() {
+    actualizeazaContainerComparare();
+});
+</script>

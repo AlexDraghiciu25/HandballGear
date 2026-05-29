@@ -2,84 +2,40 @@
 <html lang="ro">
 <head>
     <%- include('../fragments/head.ejs') %>
+    <link rel="stylesheet" href="/resurse/css/custom.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <title>HandballGear - <%= produs.nume %></title>
     <style>
         .produs-unic-container {
             max-width: 900px;
             margin: 40px auto;
             padding: 20px;
-            background: #fff;
-            border-radius: 8px;
+            background: var(--card-bg, #fff);
+            border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             display: flex;
             gap: 30px;
             flex-wrap: wrap;
+            color: var(--text-principal, #333);
+            border: 1px solid var(--border-card, #eee);
         }
-
-        .produs-imagine {
-            flex: 1;
-            min-width: 300px;
-            text-align: center;
-        }
-
-        .produs-imagine img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            padding: 10px;
-        }
-
-        .produs-detalii {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .produs-detalii h1 {
-            color: #333;
-            margin-top: 0;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-        }
-
-        .pret-mare {
-            font-size: 2em;
-            color: #28a745;
-            font-weight: bold;
-            margin: 15px 0;
-        }
-
-        .tabel-specificatii {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .tabel-specificatii th, .tabel-specificatii td {
-            text-align: left;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .tabel-specificatii th {
-            width: 40%;
-            background-color: #f8f9fa;
-            color: #555;
-        }
-
-        .btn-inapoi {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-
-        .btn-inapoi:hover {
-            background-color: #5a6268;
-        }
+        .produs-imagine { flex: 1; min-width: 300px; text-align: center; }
+        .produs-imagine img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-card, #eee); padding: 10px; }
+        .produs-detalii { flex: 1; min-width: 300px; }
+        .produs-detalii h1 { color: var(--text-principal, #333); margin-top: 0; border-bottom: 2px solid var(--accent-color, #ff6600); padding-bottom: 10px; }
+        .pret-mare { font-size: 2em; color: #28a745; font-weight: bold; margin: 15px 0; }
+        .tabel-specificatii { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .tabel-specificatii th, .tabel-specificatii td { text-align: left; padding: 10px; border-bottom: 1px solid var(--border-card, #ddd); }
+        .tabel-specificatii th { width: 40%; background-color: rgba(0,0,0,0.05); color: var(--text-principal, #555); }
+        .btn-inapoi { display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 8px; }
+        .btn-inapoi:hover { background-color: #5a6268; }
+        .badge-nou { display: inline-block; background: linear-gradient(135deg, #ff6600, #ff3300); color: white; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85em; animation: pulse-nou 1.5s infinite; margin-left: 10px; }
+        @keyframes pulse-nou { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .similar-card { text-decoration: none; color: inherit; display: block; text-align: center; padding: 15px; border-radius: 8px; border: 1px solid var(--border-card, #eee); background: var(--card-bg, #fff); transition: transform 0.3s, box-shadow 0.3s; }
+        .similar-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .similar-card img { max-height: 80px; object-fit: contain; margin-bottom: 8px; }
+        .set-card { background: var(--card-bg, #fff); border: 1px solid var(--border-card, #eee); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .carousel-control-prev, .carousel-control-next { filter: invert(1); }
     </style>
 </head>
 <body>
@@ -88,45 +44,64 @@
     <main>
         <div class="produs-unic-container">
             <div class="produs-imagine">
-                <img src="<%= produs.imagine %>" alt="Imagine <%= produs.nume %>">
+                <%# --- BONUS 9: Carusel Bootstrap pentru imagini multiple --- %>
+                <% let imagini = produs.imagini_multiple || [produs.imagine]; %>
+                <div id="caruselProdusUnic" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <% for (let i = 0; i < imagini.length; i++) { %>
+                            <button type="button" data-bs-target="#caruselProdusUnic" data-bs-slide-to="<%= i %>" class="<%= i === 0 ? 'active' : '' %>"></button>
+                        <% } %>
+                    </div>
+                    <div class="carousel-inner">
+                        <% for (let i = 0; i < imagini.length; i++) { %>
+                            <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+                                <img src="<%= imagini[i] %>" class="d-block w-100 rounded" alt="Imagine <%= i + 1 %> - <%= produs.nume %>" style="max-height: 350px; object-fit: contain; background: rgba(0,0,0,0.02); padding:10px;">
+                            </div>
+                        <% } %>
+                    </div>
+                    <% if (imagini.length > 1) { %>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#caruselProdusUnic" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#caruselProdusUnic" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    <% } %>
+                </div>
             </div>
 
             <div class="produs-detalii">
-                <h1><%= produs.nume %></h1>
+                <h1>
+                    <%= produs.nume %>
+                    <%# --- BONUS 18: Badge NOU pe pagina individuala --- %>
+                    <% 
+                        let diffZile = (new Date() - new Date(produs.data_intrare)) / (1000*60*60*24);
+                        let esteNou = diffZile <= 365;
+                    %>
+                    <% if (esteNou) { %>
+                        <span class="badge-nou"><i class="bi bi-star-fill"></i> NOU</span>
+                    <% } %>
+                </h1>
                 <div class="pret-mare"><%= produs.pret %> RON</div>
                 
                 <p><strong>Descriere completă:</strong><br> <%= produs.descriere %></p>
 
+                <%# --- BONUS 20: Buton Compara pe pagina de produs --- %>
+                <button class="btn btn-outline-info btn-sm mb-3 btn-compara" onclick="adaugaLaComparare('<%= produs.id %>', this.getAttribute('data-nume'))" data-nume="<%= produs.nume %>">
+                    <i class="bi bi-arrow-left-right"></i> Compară
+                </button>
+
                 <table class="tabel-specificatii">
                     <tbody>
-                        <tr>
-                            <th>ID Produs în Baza de Date</th>
-                            <td>#<%= produs.id %></td>
-                        </tr>
-                        <tr>
-                            <th>Categorie Principală</th>
-                            <td><%= produs.categorie_mare %></td>
-                        </tr>
-                        <tr>
-                            <th>Subcategorie</th>
-                            <td><%= produs.subcategorie %></td>
-                        </tr>
-                        <tr>
-                            <th>Culoare predominantă</th>
-                            <td><%= produs.culoare %></td>
-                        </tr>
-                        <tr>
-                            <th>Greutate / Valoare numerică</th>
-                            <td><%= produs.caracteristica_numerica %> unități</td>
-                        </tr>
-                        <tr>
-                            <th>Caracteristici Multiplă</th>
-                            <td><%= produs.caracteristici_multi.split(',').join(', ') %></td>
-                        </tr>
-                        <tr>
-                            <th>Data adăugării în magazin</th>
-                            <td><%= formateazaData(produs.data_intrare) %></td>
-                        </tr>
+                        <tr><th>ID Produs în Baza de Date</th><td>#<%= produs.id %></td></tr>
+                        <tr><th>Categorie Principală</th><td><%= produs.categorie_mare %></td></tr>
+                        <tr><th>Subcategorie</th><td><%= produs.subcategorie %></td></tr>
+                        <tr><th>Culoare predominantă</th><td><%= produs.culoare %></td></tr>
+                        <tr><th>Greutate / Valoare numerică</th><td><%= produs.caracteristica_numerica %> unități</td></tr>
+                        <tr><th>Caracteristici Multiplă</th><td><%= produs.caracteristici_multi.split(',').join(', ') %></td></tr>
+                        <tr><th>Data adăugării în magazin</th><td><%= formateazaData(produs.data_intrare) %></td></tr>
                         <tr>
                             <th>Este Noutate?</th>
                             <td>
@@ -143,6 +118,50 @@
                 <a href="/produse" class="btn-inapoi"><i class="fa-solid fa-arrow-left"></i> Înapoi la toate produsele</a>
             </div>
         </div>
+
+        <%# --- BONUS 17: Seturi care contin acest produs --- %>
+        <% if (locals.seturiProdus && seturiProdus.length > 0) { %>
+            <div class="container mt-4 mb-4" style="max-width:900px;">
+                <h3 class="mb-3"><i class="bi bi-box-seam-fill"></i> Seturi care conțin acest produs</h3>
+                <% for (let set of seturiProdus) { %>
+                    <div class="set-card">
+                        <h5 style="color:var(--accent-color, #ff6600);"><%= set.nume %></h5>
+                        <p><%= set.descriere %></p>
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <% for (let p of set.produse) { %>
+                                <a href="/produs/<%= p.id %>" style="text-decoration:none; color:inherit; text-align:center; width:80px;">
+                                    <img src="<%= p.imagine %>" alt="<%= p.nume %>" style="max-height:50px; object-fit:contain;" class="rounded">
+                                    <div style="font-size:0.7em; margin-top:3px;"><%= p.nume %></div>
+                                </a>
+                            <% } %>
+                        </div>
+                        <div>
+                            <span style="text-decoration:line-through; color:#999;"><%= set.pret_original %> RON</span>
+                            <span class="badge bg-danger">-<%= set.reducere %>%</span>
+                            <span class="fw-bold ms-2" style="color:var(--accent-color, #ff6600); font-size:1.2em;"><%= set.pret_final %> RON</span>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        <% } %>
+
+        <%# --- BONUS 16: Produse similare --- %>
+        <% if (locals.produseSimilare && produseSimilare.length > 0) { %>
+            <div class="container mt-4 mb-5" style="max-width:900px;">
+                <h3 class="mb-3"><i class="bi bi-grid-3x3-gap-fill"></i> Produse similare</h3>
+                <div class="row g-3">
+                    <% for (let sim of produseSimilare) { %>
+                        <div class="col-6 col-md-3">
+                            <a href="/produs/<%= sim.id %>" class="similar-card">
+                                <img src="<%= sim.imagine %>" alt="<%= sim.nume %>" class="img-fluid">
+                                <h6 class="mt-2 mb-1" style="font-size:0.85em;"><%= sim.nume %></h6>
+                                <span class="fw-bold" style="color:var(--accent-color, #ff6600);"><%= sim.pret %> RON</span>
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        <% } %>
     </main>
 
     <%- include('../fragments/footer.ejs') %>

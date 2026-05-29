@@ -99,6 +99,43 @@ async function initDB() {
             }
             console.log(`[OK] S-au adăugat ${produseInitiale.length} produse în PostgreSQL`);
         }
+
+        // --- BONUS 17: Creare tabele seturi și asociere_set ---
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS seturi (
+                id SERIAL PRIMARY KEY,
+                nume VARCHAR(255) NOT NULL,
+                descriere TEXT
+            )
+        `);
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS asociere_set (
+                id SERIAL PRIMARY KEY,
+                id_set INTEGER REFERENCES seturi(id),
+                id_produs INTEGER REFERENCES produse(id)
+            )
+        `);
+        console.log('[OK] Tabele seturi verificate/create');
+
+        const seturiCount = await pool.query('SELECT COUNT(*) AS cnt FROM seturi');
+        if (parseInt(seturiCount.rows[0].cnt) === 0) {
+            await pool.query(`INSERT INTO seturi (nume, descriere) VALUES 
+                ('Set Portar Profesional', 'Set complet de protecție pentru portari de handbal, incluzând cotiere, genunchiere și protecție tibie.'),
+                ('Set Antrenament Club', 'Pachet complet de antrenament pentru cluburi, cu minge, adidași, pompa și șosete.'),
+                ('Set Competiție Premium', 'Echipament premium pentru competiții oficiale IHF cu minge oficială și adidași pro.'),
+                ('Set Începător Handbal', 'Pachet accesibil pentru începători cu minge juniori, adidași confortabili și bandă absorbție.'),
+                ('Set Accesorii Esențiale', 'Cele mai importante accesorii: bandă, fluier, pompa și clister.')
+            `);
+            await pool.query(`INSERT INTO asociere_set (id_set, id_produs) VALUES 
+                (1, 11), (1, 12), (1, 13),
+                (2, 1), (2, 7), (2, 17), (2, 19),
+                (3, 5), (3, 4), (3, 14),
+                (4, 6), (4, 7), (4, 8),
+                (5, 8), (5, 9), (5, 17), (5, 18)
+            `);
+            console.log('[OK] Seturi populate cu date inițiale');
+        }
+
     } catch (err) {
         console.error('[EROARE DB INITIALIZARE]', err.message);
     }
@@ -214,6 +251,163 @@ async function getFilterMeta(callback) {
     }
 }
 
+// --- (Bonus 16) Produse similare din aceeasi categorie ---
+async function getProduseSimilare(produsId, categorie, callback) {
+    try {
+        const res = await pool.query(
+            'SELECT * FROM produse WHERE categorie_mare = $1 AND id != $2 ORDER BY id ASC LIMIT 4',
+            [categorie, produsId]
+        );
+        callback(res.rows);
+    } catch (err) {
+        console.error('[EROARE DB getProduseSimilare]', err.message);
+        callback([]);
+    }
+}
+
+// --- (Bonus 18) Produse noi (adaugate in ultimele 365 zile) ---
+async function getProduseNoi(callback) {
+    try {
+        const res = await pool.query(
+            `SELECT * FROM produse WHERE data_intrare >= NOW() - INTERVAL '365 days' ORDER BY data_intrare DESC`
+        );
+        callback(res.rows);
+    } catch (err) {
+        console.error('[EROARE DB getProduseNoi]', err.message);
+        callback([]);
+    }
+}
+
+// --- (Bonus 17) Functii helper seturi ---
+async function getSeturi(callback) {
+    try {
+        const res = await pool.query(`
+            SELECT s.id, s.nume, s.descriere, 
+                   json_agg(json_build_object('id', p.id, 'nume', p.nume, 'imagine', p.imagine, 'pret', p.pret, 'categorie_mare', p.categorie_mare)) AS produse
+            FROM seturi s
+            JOIN asociere_set a ON s.id = a.id_set
+            JOIN produse p ON a.id_produs = p.id
+            GROUP BY s.id, s.nume, s.descriere
+            ORDER BY s.id
+        `);
+        res.rows.forEach(set => {
+            let suma = set.produse.reduce((acc, p) => acc + parseFloat(p.pret), 0);
+            let n = set.produse.length;
+            let reducere = Math.min(5, n) * 5;
+            set.pret_original = suma.toFixed(2);
+            set.reducere = reducere;
+            set.pret_final = (suma * (1 - reducere / 100)).toFixed(2);
+        });
+        callback(res.rows);
+    } catch (err) {
+        console.error('[EROARE DB getSeturi]', err.message);
+        callback([]);
+    }
+}
+
+async function getSeturiPentruProdus(produsId, callback) {
+    try {
+        const res = await pool.query(`
+            SELECT s.id, s.nume, s.descriere,
+                   json_agg(json_build_object('id', p.id, 'nume', p.nume, 'imagine', p.imagine, 'pret', p.pret)) AS produse
+            FROM seturi s
+            JOIN asociere_set a ON s.id = a.id_set
+            JOIN produse p ON a.id_produs = p.id
+            WHERE s.id IN (SELECT id_set FROM asociere_set WHERE id_produs = $1)
+            GROUP BY s.id, s.nume, s.descriere
+            ORDER BY s.id
+        `, [produsId]);
+        res.rows.forEach(set => {
+            let suma = set.produse.reduce((acc, p) => acc + parseFloat(p.pret), 0);
+            let n = set.produse.length;
+            let reducere = Math.min(5, n) * 5;
+            set.pret_original = suma.toFixed(2);
+            set.reducere = reducere;
+            set.pret_final = (suma * (1 - reducere / 100)).toFixed(2);
+        });
+        callback(res.rows);
+    } catch (err) {
+        console.error('[EROARE DB getSeturiPentruProdus]', err.message);
+        callback([]);
+    }
+}
+
+// --- (Bonus 12) Functii pentru sistemul de oferte ---
+function getOfertaCurenta() {
+    const caleFisier = path.join(__dirname, 'resurse/json/oferte.json');
+    try {
+        if (!fs.existsSync(caleFisier)) return null;
+        let date = JSON.parse(fs.readFileSync(caleFisier, 'utf8'));
+        if (date.oferte && date.oferte.length > 0) {
+            let prima = date.oferte[0];
+            let dataFin = new Date(prima['data-finalizare']);
+            if (dataFin > new Date()) return prima;
+        }
+        return null;
+    } catch (err) {
+        console.error('[EROARE] Citire oferte.json:', err.message);
+        return null;
+    }
+}
+
+async function genereazaOferta() {
+    const caleFisier = path.join(__dirname, 'resurse/json/oferte.json');
+    const T_MINUTE = 2; // Interval de 2 minute pentru prezentare
+    const T2_MINUTE = 10; // Ofertele mai vechi de T2 minute se sterg
+    
+    try {
+        const catRes = await pool.query('SELECT DISTINCT categorie_mare FROM produse ORDER BY categorie_mare');
+        let categorii = catRes.rows.map(r => r.categorie_mare);
+        if (categorii.length === 0) return;
+
+        let date = { oferte: [] };
+        if (fs.existsSync(caleFisier)) {
+            try { date = JSON.parse(fs.readFileSync(caleFisier, 'utf8')); } catch (e) { date = { oferte: [] }; }
+        }
+
+        // Stergem ofertele mai vechi de T2 minute
+        let acum = new Date();
+        date.oferte = date.oferte.filter(of => {
+            let dataFin = new Date(of['data-finalizare']);
+            return (acum - dataFin) / 60000 < T2_MINUTE;
+        });
+
+        // Nu generam daca oferta curenta e inca activa
+        if (date.oferte.length > 0) {
+            let ultimaFinalizare = new Date(date.oferte[0]['data-finalizare']);
+            if (ultimaFinalizare > acum) {
+                fs.writeFileSync(caleFisier, JSON.stringify(date, null, 2));
+                return;
+            }
+        }
+
+        // Alegem categorie aleatorie (diferita de ultima)
+        let ultimaCategorie = date.oferte.length > 0 ? date.oferte[0].categorie : null;
+        let categoriiDisponibile = categorii.filter(c => c !== ultimaCategorie);
+        if (categoriiDisponibile.length === 0) categoriiDisponibile = categorii;
+        let categorieAleasa = categoriiDisponibile[Math.floor(Math.random() * categoriiDisponibile.length)];
+
+        let valoriReducere = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+        let reducereAleasa = valoriReducere[Math.floor(Math.random() * valoriReducere.length)];
+
+        let dataIncepere = new Date();
+        let dataFinalizare = new Date(dataIncepere.getTime() + T_MINUTE * 60000);
+
+        date.oferte.unshift({
+            categorie: categorieAleasa,
+            'data-incepere': dataIncepere.toISOString(),
+            'data-finalizare': dataFinalizare.toISOString(),
+            reducere: reducereAleasa
+        });
+
+        fs.writeFileSync(caleFisier, JSON.stringify(date, null, 2));
+        console.log(`[OFERTA] Ofertă nouă: ${reducereAleasa}% reducere la ${categorieAleasa}`);
+    } catch (err) {
+        console.error('[EROARE] Generare ofertă:', err.message);
+    }
+}
+
+// --- CERINȚA ETAPA 5: Pregătire cadru de lucru (Variabile globale pentru căi SCSS/CSS) ---
 // Variabila globala pentru erori (Cerinta)
 global.obGlobal = {
     obErori: null,
@@ -324,28 +518,7 @@ function initErori() {
 }
 initErori();
 
-function verificaDateGalerie() {
-    try {
-        const jsonPath = path.join(__dirname, 'resurse/json/galerie.json');
-        if (!fs.existsSync(jsonPath)) return;
-        const date = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-        const folderGal = path.join(__dirname, date.cale_galerie);
-
-        if (!fs.existsSync(folderGal)) {
-            console.error(`[EROARE JSON] Folderul "${date.cale_galerie}" NU există!`);
-        } else {
-            date.imagini.forEach(img => {
-                let caleImg = path.join(folderGal, img.cale_imagine);
-                if (!fs.existsSync(caleImg)) {
-                    console.error(`[EROARE JSON] Imaginea "${img.cale_imagine}" lipsește din folder!`);
-                }
-            });
-        }
-    } catch (err) { console.error('[EROARE JSON] Galerie invalidă.'); }
-}
-verificaDateGalerie();
-
-// --- BONUS 5: Verificare Date Galerie JSON ---
+// --- BONUS 5 ETAPA 5 (0.05p): Verificarea datelor din JSON-ul cu imagini la pornirea serverului ---
 function verificaDateGalerie() {
     try {
         const jsonPath = path.join(__dirname, 'resurse/json/galerie.json');
@@ -370,7 +543,6 @@ function verificaDateGalerie() {
         console.error('[EROARE JSON] Galerie: format invalid sau fișier lipsă.');
     }
 }
-// Apelăm funcția la pornire
 verificaDateGalerie();
 
 // --- 3. FUNCTIE AFISARE EROARE (Cerinta: afisareEroare) ---
@@ -394,6 +566,7 @@ function afisareEroare(res, identificator, titlu, text, imagine) {
 }
 
 // --- 4. CREARE AUTOMATA FOLDERE (Cerinta: vect_foldere) ---
+// --- CERINȚA ETAPA 5: Adăugarea folderului backup la lista folderelor create automat ---
 const vect_foldere = ["temp", "logs", "backup", "backup/resurse/css", "fisiere_uploadate"];
 vect_foldere.forEach(f => {
     let cale = path.join(__dirname, f);
@@ -402,20 +575,40 @@ vect_foldere.forEach(f => {
     }
 });
 
+// --- BONUS 13 (0.15p): Ștergere periodică backup-uri vechi ---
+const T_BACKUP_MINUTE = 60;
+setInterval(() => {
+    let folderBackup = path.join(__dirname, 'backup/resurse/css');
+    if (!fs.existsSync(folderBackup)) return;
+    let fisiere = fs.readdirSync(folderBackup);
+    let acum = Date.now();
+    fisiere.forEach(fisier => {
+        let match = fisier.match(/_(\d+)\.css$/);
+        if (match) {
+            let timestampFisier = parseInt(match[1]);
+            let diffMinute = (acum - timestampFisier) / 60000;
+            if (diffMinute > T_BACKUP_MINUTE) {
+                fs.unlinkSync(path.join(folderBackup, fisier));
+                console.log(`[BACKUP] Șters fișier vechi: ${fisier}`);
+            }
+        }
+    });
+}, 60000);
+
+// --- BONUS 12: Inițializare sistem oferte ---
+genereazaOferta();
+setInterval(() => { genereazaOferta(); }, 2 * 60000);
+
 // =======================================================
-// --- COMPILARE AUTOMATĂ SCSS -> CSS (Cerinta SCSS) ---
+// --- CERINȚA ETAPA 5 (0.25p): COMPILARE AUTOMATĂ SCSS -> CSS ---
 // =======================================================
 
-// 1. Funcția principală de compilare și backup
-// =======================================================
-// --- COMPILARE AUTOMATĂ SCSS (Update cu Bonus 3 & 4) ---
-// =======================================================
-
+// --- CERINȚA ETAPA 5: Funcția de compilare a scss-urilor (compileazaScss) ---
 function compileazaScss(caleScss, caleCss) {
     try {
         let absoluteCaleScss = path.isAbsolute(caleScss) ? caleScss : path.join(global.obGlobal.folderScss, caleScss);
         
-        // Bonus 4: Gestionare corectă a numelor cu mai multe puncte
+        // --- BONUS 4 ETAPA 5 (0.025p): ---
         let numeFisierScss = path.basename(absoluteCaleScss);
         let numeFisierFaraExtensie = numeFisierScss.substring(0, numeFisierScss.lastIndexOf('.'));
         
@@ -423,12 +616,12 @@ function compileazaScss(caleScss, caleCss) {
             (path.isAbsolute(caleCss) ? caleCss : path.join(global.obGlobal.folderCss, caleCss)) : 
             path.join(global.obGlobal.folderCss, `${numeFisierFaraExtensie}.css`);
 
-        // Salvare in backup inainte de suprascriere
+        // --- CERINȚA ETAPA 5: Salvare în backup (înainte de suprascriere) ---
         if (fs.existsSync(absoluteCaleCss)) {
             let folderBackup = path.join(__dirname, 'backup/resurse/css');
             if (!fs.existsSync(folderBackup)) fs.mkdirSync(folderBackup, { recursive: true });
 
-            // Bonus 3: Informație de timp (timestamp) în numele backup-ului
+            // --- BONUS 3 ETAPA 5 (0.05p): Informație de timp (timestamp) în numele backup-ului ---
             let timestamp = new Date().getTime(); 
             let numeBackup = `${numeFisierFaraExtensie}_${timestamp}.css`;
             let caleBackup = path.join(folderBackup, numeBackup);
@@ -450,14 +643,14 @@ function compileazaScss(caleScss, caleCss) {
     }
 }
 
-// Compilare inițială
+// --- CERINȚA ETAPA 5: Compilare inițială (La pornirea serverului) ---
 if (fs.existsSync(global.obGlobal.folderScss)) {
     fs.readdirSync(global.obGlobal.folderScss).forEach(file => {
         if (file.endsWith('.scss')) compileazaScss(file);
     });
 }
 
-// Watcher (Compilare pe parcurs)
+// --- CERINȚA ETAPA 5: Compilare pe parcurs (folosind fs.watch) ---
 if (fs.existsSync(global.obGlobal.folderScss)) {
     fs.watch(global.obGlobal.folderScss, (event, filename) => {
         if (filename && filename.endsWith('.scss')) {
@@ -495,11 +688,13 @@ app.get("/produse", (req, res) => {
     
     getProduse(categorie, produse => {
         getFilterMeta(filterMeta => {
+            let oferta = getOfertaCurenta();
             res.render('pages/produse', {
                 ip: req.ip,
                 produse: produse,
                 categorieSelectata: categorie,
-                filterMeta: filterMeta
+                filterMeta: filterMeta,
+                oferta: oferta
             });
         });
     });
@@ -580,9 +775,15 @@ app.get("/produs/:id", (req, res) => {
         if (!produs) {
             return afisareEroare(res, 404);
         }
-        res.render('pages/produs', {
-            ip: req.ip,
-            produs: produs
+        getProduseSimilare(id, produs.categorie_mare, similare => {
+            getSeturiPentruProdus(id, seturi => {
+                res.render('pages/produs', {
+                    ip: req.ip,
+                    produs: produs,
+                    produseSimilare: similare,
+                    seturiProdus: seturi
+                });
+            });
         });
     });
 });
@@ -614,7 +815,7 @@ app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
     let d = new Date();
     let minCurente = d.getHours() * 60 + d.getMinutes();
 
-    // Filtrare poze (aceeași logică pentru ambele galerii)
+    // --- CERINȚA ETAPA 5: Galeria statica (Filtrarea timpului, redimensionare etc.) ---
     let imaginiFiltrate = imagini.filter(img => {
         let [start, end] = img.timp.split('-');
         let minStart = parseInt(start.split(':')[0]) * 60 + parseInt(start.split(':')[1]);
@@ -631,7 +832,30 @@ app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
         imaginiStatice = imaginiStatice.slice(0, 10);
     }
 
-    // 2. LOGICA PENTRU GALERIA ANIMATĂ (Identificator: galerie-animata)
+    // GENERARE DINAMICĂ SHARP (Cerință Galerie Statică)
+    // Creăm imaginile pentru ecran mediu și mic format .webp la vizitarea paginii
+    let folderFizicGalerie = path.join(__dirname, caleGalerie);
+    imaginiStatice.forEach(function(img) {
+        let caleAbsoluta = path.join(folderFizicGalerie, img.cale_imagine);
+        let numeFaraExtensie = img.cale_imagine.split('.')[0];
+        
+        let numeMic = numeFaraExtensie + '-mic.webp';
+        let numeMediu = numeFaraExtensie + '-mediu.webp';
+        
+        img.cale_mica = caleGalerie + numeMic;
+        img.cale_medie = caleGalerie + numeMediu;
+
+        if (fs.existsSync(caleAbsoluta)) {
+            if (!fs.existsSync(path.join(folderFizicGalerie, numeMic))) {
+                sharp(caleAbsoluta).resize(300).toFormat('webp').toFile(path.join(folderFizicGalerie, numeMic)).catch(err => console.log(err));
+            }
+            if (!fs.existsSync(path.join(folderFizicGalerie, numeMediu))) {
+                sharp(caleAbsoluta).resize(600).toFormat('webp').toFile(path.join(folderFizicGalerie, numeMediu)).catch(err => console.log(err));
+            }
+        }
+    });
+
+    // --- BONUS 1 ETAPA 5 (0.5p): Galeria animată (cerință individuală) ---
     // Dacă filtrul de timp returnează prea puține poze (sub 6), folosim tot setul pentru a respecta cerința 6-12
     let sursaPoze = imaginiFiltrate.length >= 6 ? imaginiFiltrate : imagini;
 
@@ -663,13 +887,43 @@ app.get(["/", "/index", "/home", "/galerie"], async function(req, res) {
     }
 
     let templateName = req.path === '/galerie' ? 'galerie' : 'index';
-    res.render(`pages/${templateName}`, { 
-        ip: req.ip, 
-        imaginiGalerie: imaginiStatice,
-        imaginiAnimate: imaginiAnimate,
-        cssGalerieAnimata: cssGalerieAnimata,
-        caleBaza: caleGalerie
+    getProduseNoi(produseNoi => {
+        let oferta = getOfertaCurenta();
+        res.render(`pages/${templateName}`, { 
+            ip: req.ip, 
+            imaginiGalerie: imaginiStatice,
+            imaginiAnimate: imaginiAnimate,
+            cssGalerieAnimata: cssGalerieAnimata,
+            caleBaza: caleGalerie,
+            produseNoi: produseNoi,
+            oferta: oferta
+        });
     });
+});
+
+// --- BONUS 17: Pagina seturi de produse ---
+app.get("/seturi", (req, res) => {
+    getSeturi(seturi => {
+        res.render('pages/seturi', {
+            ip: req.ip,
+            seturi: seturi
+        });
+    });
+});
+
+// --- BONUS 20: API JSON pentru un produs (pt comparare) ---
+app.get("/api/produs/:id", (req, res) => {
+    let id = parseInt(req.params.id);
+    getProdusById(id, produs => {
+        if (!produs) return res.status(404).json({ error: 'Produs negăsit' });
+        res.json(produs);
+    });
+});
+
+// --- BONUS 12: API oferta curentă ---
+app.get("/api/oferta-curenta", (req, res) => {
+    let oferta = getOfertaCurenta();
+    res.json(oferta || { expired: true });
 });
 
 // Cerinta: Eroare 400 pentru fisiere .ejs

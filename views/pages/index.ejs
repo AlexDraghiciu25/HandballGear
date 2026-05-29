@@ -38,6 +38,82 @@
       <div class="efect-duotone"></div>
   </section>
 
+  <%# --- BONUS 12: Sectiune Oferta cu Temporizator --- %>
+  <% if (locals.oferta && oferta) { %>
+  <section id="oferta-timer" class="container mt-5 mb-4 p-4 rounded shadow" style="background: linear-gradient(135deg, #1e293b, #334155); color:white; text-align:center;">
+      <h3><i class="bi bi-lightning-charge-fill" style="color:#fbbf24;"></i> Ofertă Specială!</h3>
+      <p class="lead mb-2">
+          <span class="badge bg-danger" style="font-size:1.2em; padding:8px 16px;"><%= oferta.reducere %>% REDUCERE</span>
+          la categoria <strong style="color:#fbbf24;"><%= oferta.categorie %></strong>
+      </p>
+      <p class="mb-3">Oferta expiră în:</p>
+      <div id="countdown-oferta" style="font-size:2.5em; font-weight:bold; font-family:monospace; letter-spacing:3px; transition: color 0.3s;">
+          00:00:00
+      </div>
+      <p class="mt-2 mb-0"><a href="/produse?categorie=<%= oferta.categorie %>" class="btn btn-warning btn-lg mt-2"><i class="bi bi-cart-fill"></i> Vezi produsele</a></p>
+  </section>
+  <script>
+  (function() {
+      let dataFinalizare = new Date('<%= oferta["data-finalizare"] %>');
+      let countdownEl = document.getElementById('countdown-oferta');
+      let sectiuneOferta = document.getElementById('oferta-timer');
+      
+      function actualizeazaTimer() {
+          let acum = new Date();
+          let diff = dataFinalizare - acum;
+          
+          if (diff <= 0) {
+              // Oferta a expirat - fetch oferta noua
+              countdownEl.textContent = 'EXPIR\u0102!';
+              countdownEl.style.color = '#ef4444';
+              setTimeout(function() {
+                  fetch('/api/oferta-curenta')
+                      .then(r => r.json())
+                      .then(data => {
+                          if (data && !data.expired) {
+                              // Reload pagina pt noua oferta
+                              location.reload();
+                          } else {
+                              sectiuneOferta.style.display = 'none';
+                          }
+                      })
+                      .catch(() => { sectiuneOferta.style.display = 'none'; });
+              }, 3000);
+              return;
+          }
+          
+          let secunde = Math.floor(diff / 1000);
+          let ore = Math.floor(secunde / 3600);
+          let min = Math.floor((secunde % 3600) / 60);
+          let sec = secunde % 60;
+          
+          countdownEl.textContent = 
+              String(ore).padStart(2, '0') + ':' + 
+              String(min).padStart(2, '0') + ':' + 
+              String(sec).padStart(2, '0');
+          
+          // Ultimele 10 secunde - marcaj diferit
+          if (secunde <= 10) {
+              countdownEl.style.color = '#ef4444';
+              countdownEl.style.animation = 'pulse-countdown 0.5s infinite';
+          } else {
+              countdownEl.style.color = '#fbbf24';
+              countdownEl.style.animation = 'none';
+          }
+      }
+      
+      actualizeazaTimer();
+      setInterval(actualizeazaTimer, 1000);
+  })();
+  </script>
+  <style>
+      @keyframes pulse-countdown {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.15); opacity: 0.7; }
+      }
+  </style>
+  <% } %>
+
   <section id="oferta-speciala" class="container mt-5 mb-5 p-5 bg-light rounded shadow-sm">
   <h1 class="mb-3 efect-reflexie" data-text="Echipament Profesional de Handbal">
     Echipament Profesional de Handbal
@@ -448,6 +524,32 @@
         <area shape="rect" coords="500,800,650,1050" href="/adidasi" alt="Adidasi" title="Adidași indoor">
       </map>
     </section>
+
+  <%# --- BONUS 18: Sectiune Produse Noi pe prima pagina --- %>
+  <% if (locals.produseNoi && produseNoi.length > 0) { %>
+  <section id="produse-noi" class="container mt-5 mb-5">
+      <h2 class="text-center mb-4"><i class="bi bi-stars"></i> Produse Noi</h2>
+      <p class="text-center text-muted mb-4">Ultimele produse adăugate în magazin, în ordine invers cronologică:</p>
+      <div class="row g-3">
+          <% for (let i = 0; i < Math.min(produseNoi.length, 8); i++) { %>
+              <% let pn = produseNoi[i]; %>
+              <div class="col-6 col-md-3">
+                  <a href="/produs/<%= pn.id %>" style="text-decoration:none; color:inherit; display:block; text-align:center; padding:15px; border-radius:12px; border:1px solid var(--border-card, #eee); background:var(--card-bg, #fff); transition:transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                      <div style="position:relative; display:inline-block;">
+                          <img src="<%= pn.imagine %>" alt="<%= pn.nume %>" style="max-height:80px; object-fit:contain;" class="img-fluid rounded">
+                          <span style="position:absolute; top:-5px; right:-10px; background:linear-gradient(135deg,#ff6600,#ff3300); color:white; padding:2px 8px; border-radius:10px; font-size:0.65em; font-weight:bold;">NOU</span>
+                      </div>
+                      <h6 class="mt-2 mb-1" style="font-size:0.85em;"><%= pn.nume %></h6>
+                      <span class="fw-bold" style="color:var(--accent-color, #ff6600);"><%= pn.pret %> RON</span>
+                  </a>
+              </div>
+          <% } %>
+      </div>
+      <div class="text-center mt-3">
+          <a href="/produse" class="btn btn-primary"><i class="bi bi-arrow-right"></i> Vezi toate produsele</a>
+      </div>
+  </section>
+  <% } %>
 
 </main>
 

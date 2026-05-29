@@ -13,58 +13,50 @@ $form-range-track-bg: #808080; // Un gri pentru bara din spate
 // Importăm tot Bootstrap-ul (asigură-te că ai instalat pachetul 'bootstrap' în node_modules)
 // Dacă nu îți compilează corect calea, folosește calea completă către fișierul tău bootstrap.scss
 
+// --- CERINȚA ETAPA 5 (0.25p): Customizare Bootstrap ---
 /* ========================================================= */
-/* 1. SUPRASCRIEREA VARIABILELOR BOOTSTRAP (Cerința ta)     */
+/* 1. SUPRASCRIEREA VARIABILELOR BOOTSTRAP                   */
 /* ========================================================= */
 
-// a) Familia de font implicită
+// --- CERINȚA ETAPA 5: Familia de font implicită ---
 $font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
-// b) Culorile de background pentru minim 2 teme (ex: primary și secondary)
-// Am ales un Portocaliu (pentru handbal) și un Albastru închis
+// --- CERINȚA ETAPA 5: Culorile de background pentru minim 2 teme ---
 $primary: #ff6600; 
 $secondary: #2c3e50; 
 
-// c) Culori de font (ex: culoarea textului pe butoane / pe temele de mai sus)
-// Fortam textul de pe butoanele primary si secondary sa fie alb absolut
+// --- CERINȚA ETAPA 5: Culori de font (ex: buton) ---
 $primary-text: #ffffff;
 $secondary-text: #ffffff;
 
-// d) Dimensiuni de ecran diferite pentru ecrane medii (md) și mari (lg)
-// Modificam pragurile standard (ex: de la 768px la 700px pentru md)
+// --- CERINȚA ETAPA 5: Dimensiuni de ecran diferite pentru ecrane medii (md) și mari (lg) ---
 $grid-breakpoints: (
   xs: 0,
   sm: 576px,
-  md: 700px, // Schimbat de la 768px
-  lg: 1024px, // Schimbat de la 992px
+  md: 700px, 
+  lg: 1024px, 
   xl: 1200px,
   xxl: 1400px
 );
 
-// e) Dimensiunea razelor de border
-// Rotunjim mai mult elementele din Bootstrap
+// --- CERINȚA ETAPA 5: Dimensiunea razelor de border ---
 $border-radius: 12px;
 $border-radius-lg: 20px;
 $border-radius-sm: 8px;
 
-// f) Dimensiunea literelor heading-urilor (h1, h2 etc.)
+// --- CERINȚA ETAPA 5: Dimensiunea literelor headingurilor (h1, h2 etc.) ---
 $h1-font-size: 3rem; // Mai mare
 $h2-font-size: 2.5rem;
 $h3-font-size: 2rem;
 
-// g) Încă una sau mai multe variabile alese de voi
-// Am activat umbrele (shadows) pentru toate elementele Bootstrap care suporta si am marit spatierea
+// --- CERINȚA ETAPA 5: Încă una sau mai multe variabile alese de voi ---
 $enable-shadows: true;
-$spacer: 1.5rem; // Mareste marginile/padding-urile standard (m-1, p-2 etc.)
+$spacer: 1.5rem; 
 
-/* ========================================================= */
-/* 2. IMPORTUL BOOTSTRAP (Trebuie să fie DUPĂ variabile!)   */
-/* ========================================================= */
+// --- CERINȚA ETAPA 5: CSS-ul pentru bootstrap trebuie pus primul pentru a asigura suprascrierea ---
 @import "../../node_modules/bootstrap/scss/bootstrap";
 
-/* ========================================================= */
 /* 3. REGLAJE EXTRA (Daca ai nevoie sa corectezi textul de pe butoane) */
-/* ========================================================= */
 .btn-primary {
     color: $primary-text !important;
 }
@@ -72,10 +64,9 @@ $spacer: 1.5rem; // Mareste marginile/padding-urile standard (m-1, p-2 etc.)
     color: $secondary-text !important;
 }
 
-/* REGULA DE AUR PENTRU DUOTONE:
-  c1, c3 = culori ÎNCHISE (pentru umbre)
-  c2, c4 = culori DESCHISE (pentru lumini)
-*/
+// --- CERINȚA ETAPA 5: EFECTE CSS (0.25p) + BONUS 2 (Mai multe efecte) ---
+
+// --- CERINȚA ETAPA 5 (0.05p): Duotone (cerință individuală) ---
 $c1: #00004d; // Umbre normal (bleumarin foarte închis)
 $c2: #00ffcc; // Lumini normal (verde mentă luminos)
 
@@ -90,13 +81,13 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
   background-size: cover;
   background-position: center;
   position: relative;
-  isolation: isolate; /* Păstrăm izolarea ca să nu se amestece cu fundalul alb al site-ului */
+  isolation: isolate; 
   overflow: hidden;
 
   &::before, &::after {
     content: "";
     position: absolute;
-    inset: 0; /* Scurtătură modernă pentru top:0; left:0; right:0; bottom:0; */
+
     transition: background-color 0.8s ease-in-out;
     pointer-events: none; 
   }
@@ -115,17 +106,16 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
     z-index: 2;
   }
 
-  /* La HOVER, aducem noile perechi de culori */
   &:hover::before { 
-    background-color: $c4; /* Noua culoare deschisă */
+    background-color: $c4; /* culoare deschisa */
   }
   
   &:hover::after { 
-    background-color: $c3; /* Noua culoare închisă */
+    background-color: $c3; 
   }
 }
 
-/* --- EFECT REFLEXIE TEXT (0.15p) --- */
+// --- CERINȚA ETAPA 5 (0.15p): Reflexie (cerință individuală) ---
 .efect-reflexie {
   position: relative;
   display: inline-block;
@@ -139,10 +129,8 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
     left: 0;
     width: 100%;
     
-    /* Mutăm ancora în partea dreaptă-jos pentru o înclinare naturală spre stânga */
     transform-origin: bottom right; 
     
-    /* MAGIA: Am pus -40deg ca să o înclinăm în direcția opusă! */
     transform: scaleY(-1) skewX(-40deg); 
     
     filter: blur(1px);
@@ -155,40 +143,38 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
   }
 
   &:hover::after {
-    /* La hover, se alungește și se apleacă mai mult spre stânga (-50deg) */
     transform: scaleY(-1.8) skewX(-50deg); 
     filter: blur(2.5px); 
   }
 }
 
 /* ========================================================= */
-/* 4. RESTUL CERINȚELOR COMUNE (Efecte CSS)                  */
+/* 4. RESTUL CERINȚELOR COMUNE (Efecte CSS adiționale)       */
 /* ========================================================= */
 
-// --- A. Schimbarea textului selectat (0.025p) ---
+// --- CERINȚA ETAPA 5 (0.025p): Schimbarea afișării implicite a textului selectat (::selection) ---
 ::selection {
-    background-color: $primary; // Portocaliul tău
-    color: $primary-text;       // Albul tău
+    background-color: $primary; 
+    color: $primary-text;       
     text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
 }
 
-// --- B. Scrierea textului pe coloane (0.025p) ---
+// --- CERINȚA ETAPA 5 (0.025p): Scrierea textului pe coloane (column-count) ---
 .text-coloane {
-    column-count: 1; // Implicit pe mobil
+    column-count: 1; 
     column-gap: 30px;
     
-    // Folosim breakpoint-ul LG (1024px) definit de tine mai sus
     @media (min-width: 1024px) {
         column-count: 3;
         column-rule: 2px solid $primary;
     }
 }
 
-// --- C. Text care se plimbă orizontal (Animație recurentă) (0.05p) ---
+// --- CERINȚA ETAPA 5 (0.05p): Text care se plimbă orizontal printr-o animație recurentă (Marquee) ---
 .container-marquee {
     width: 100%;
     overflow: hidden;
-    background: $secondary; // Albastru închis
+    background: $secondary; 
     color: white;
     padding: 10px 0;
     margin: 20px 0;
@@ -209,7 +195,7 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
     100% { transform: translateX(-100%); }
 }
 
-// --- D. Background fix la scroll cu animație de schimbare (0.05p) ---
+// --- CERINȚA ETAPA 5 (0.05p): Background fix la scroll (background-attachment) cu animație ---
 .sectiune-focus {
     min-height: 400px;
     background-attachment: fixed;
@@ -231,7 +217,8 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
     }
 }
 
-// --- E. Tabel Responsive + Transpus (0.05p + 0.025p) ---
+// --- CERINȚA ETAPA 5 (0.05p): Afișarea unui tabel responsive ---
+// --- CERINȚA ETAPA 5 (0.025p): Afișarea unui tabel transpus conform exemplului ---
 .tabel-responsive-magazin {
     width: 100%;
     border-collapse: collapse;
@@ -249,10 +236,9 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
         text-transform: uppercase;
     }
 
-    // Tabelul devine transpus/card pe ecrane mici (sub breakpoint-ul MD de 700px pus de tine)
     @media (max-width: 700px) {
         thead {
-            display: none; // Ascundem capul tabelului
+            display: none; 
         }
         
         tr {
@@ -270,7 +256,7 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
             border-bottom: 1px solid #eee;
             
             &::before {
-                content: attr(data-label); // Preia numele coloanei
+                content: attr(data-label); 
                 position: absolute;
                 left: 15px;
                 width: 45%;
@@ -287,45 +273,45 @@ $c4: #ffcc00; // Lumini hover (galben luminos)
 }
 
 /* ========================================================= */
-/* 5. STILIZARE HR (Identificator: efect-css-stilizare-hr)   */
+/* 5. STILIZARE HR                                           */
 /* ========================================================= */
+// --- CERINȚA ETAPA 5 (0.1p): Stilizare hr (cerință individuală) ---
 hr {
   border: none;
-  height: 3px;                      /* Grosimea liniei */
-  background: $primary;             /* Culoarea principală (Portocaliu) */
+  height: 3px;                      
+  background: $primary;             
   margin: 4rem 0;
   position: relative;
-  overflow: visible;                /* Important pentru a vedea simbolurile */
-  opacity: 1;                       /* Reset opacitate Bootstrap */
+  overflow: visible;                
+  opacity: 1;                       
 
   /* Simbolul din STÂNGA (::before) */
   &::before {
-    content: "\f005";               /* FontAwesome Solid Star */
+    content: "\f005";               
     font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
     font-weight: 900;
     position: absolute;
-    left: 20%;                      /* Poziționare la 20% din lungime */
+    left: 20%;                      
     top: 50%;
     transform: translate(-50%, -50%);
     
-    background-color: white;        /* Acoperă linia sub simbol */
+    background-color: white;        
     padding: 0 10px;
-    color: $secondary;              /* Albastrul tău închis */
+    color: $secondary;              
     font-size: 1.5rem;
     transition: all 0.6s ease-in-out;
   }
 
-  /* Simbolul din DREAPTA (::after) */
   &::after {
-    content: "\f005";               /* FontAwesome Solid Star */
+    content: "\f005";               
     font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
     font-weight: 900;
     position: absolute;
-    right: 20%;                     /* Poziționare la 20% de marginea din dreapta */
+    right: 20%;                     
     top: 50%;
     transform: translate(50%, -50%);
     
-    background-color: white;        /* Acoperă linia sub simbol */
+    background-color: white;        
     padding: 0 10px;
     color: $secondary;
     font-size: 1.5rem;
@@ -437,18 +423,18 @@ h1, h2, h3, h4, h5, h6, p, label {
     position: relative;
     overflow: hidden;
     border-radius: 8px;
-    height: 250px; /* Forțăm o înălțime fixă ca să nu mai fie pozele lungi */
+    height: 250px; 
 }
 
 /* Stilizare Imagini */
 .galerie-statica picture img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Face ca poza să taie marginile frumos în loc să se turtească */
+    object-fit: cover; 
     display: block;
     border-radius: 8px;
     
-    /* Cerinta: Tranzitie de 1.25 secunde, pastrand granita de jos aliniata */
+    /* Cerinta: Tranzitie de 1.25 */
     transition: transform 1.25s ease;
     transform-origin: bottom center;
 }

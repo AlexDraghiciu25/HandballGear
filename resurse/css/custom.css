@@ -1,9 +1,6 @@
 @charset "UTF-8";
 /* ========================================================= */
-/* 1. SUPRASCRIEREA VARIABILELOR BOOTSTRAP (Cerința ta)     */
-/* ========================================================= */
-/* ========================================================= */
-/* 2. IMPORTUL BOOTSTRAP (Trebuie să fie DUPĂ variabile!)   */
+/* 1. SUPRASCRIEREA VARIABILELOR BOOTSTRAP                   */
 /* ========================================================= */
 /*!
  * Bootstrap  v5.3.8 (https://getbootstrap.com/)
@@ -11899,9 +11896,7 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
-/* ========================================================= */
 /* 3. REGLAJE EXTRA (Daca ai nevoie sa corectezi textul de pe butoane) */
-/* ========================================================= */
 .btn-primary {
   color: #ffffff !important;
 }
@@ -11910,10 +11905,6 @@ textarea.form-control-lg {
   color: #ffffff !important;
 }
 
-/* REGULA DE AUR PENTRU DUOTONE:
-  c1, c3 = culori ÎNCHISE (pentru umbre)
-  c2, c4 = culori DESCHISE (pentru lumini)
-*/
 .efect-duotone {
   width: 100%;
   height: 50vh;
@@ -11922,13 +11913,12 @@ textarea.form-control-lg {
   background-size: cover;
   background-position: center;
   position: relative;
-  isolation: isolate; /* Păstrăm izolarea ca să nu se amestece cu fundalul alb al site-ului */
+  isolation: isolate;
   overflow: hidden;
 }
 .efect-duotone::before, .efect-duotone::after {
   content: "";
   position: absolute;
-  inset: 0; /* Scurtătură modernă pentru top:0; left:0; right:0; bottom:0; */
   transition: background-color 0.8s ease-in-out;
   pointer-events: none;
 }
@@ -11948,17 +11938,13 @@ textarea.form-control-lg {
   mix-blend-mode: screen;
   z-index: 2;
 }
-.efect-duotone {
-  /* La HOVER, aducem noile perechi de culori */
-}
 .efect-duotone:hover::before {
-  background-color: #ffcc00; /* Noua culoare deschisă */
+  background-color: #ffcc00; /* culoare deschisa */
 }
 .efect-duotone:hover::after {
-  background-color: #4d0000; /* Noua culoare închisă */
+  background-color: #4d0000;
 }
 
-/* --- EFECT REFLEXIE TEXT (0.15p) --- */
 .efect-reflexie {
   position: relative;
   display: inline-block;
@@ -11971,9 +11957,7 @@ textarea.form-control-lg {
   top: 0;
   left: 0;
   width: 100%;
-  /* Mutăm ancora în partea dreaptă-jos pentru o înclinare naturală spre stânga */
   transform-origin: bottom right;
-  /* MAGIA: Am pus -40deg ca să o înclinăm în direcția opusă! */
   transform: scaleY(-1) skewX(-40deg);
   filter: blur(1px);
   -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 80%);
@@ -11982,13 +11966,12 @@ textarea.form-control-lg {
   pointer-events: none;
 }
 .efect-reflexie:hover::after {
-  /* La hover, se alungește și se apleacă mai mult spre stânga (-50deg) */
   transform: scaleY(-1.8) skewX(-50deg);
   filter: blur(2.5px);
 }
 
 /* ========================================================= */
-/* 4. RESTUL CERINȚELOR COMUNE (Efecte CSS)                  */
+/* 4. RESTUL CERINȚELOR COMUNE (Efecte CSS adiționale)       */
 /* ========================================================= */
 ::selection {
   background-color: #ff6600;
@@ -12101,44 +12084,41 @@ textarea.form-control-lg {
 }
 
 /* ========================================================= */
-/* 5. STILIZARE HR (Identificator: efect-css-stilizare-hr)   */
+/* 5. STILIZARE HR                                           */
 /* ========================================================= */
 hr {
   border: none;
-  height: 3px; /* Grosimea liniei */
-  background: #ff6600; /* Culoarea principală (Portocaliu) */
+  height: 3px;
+  background: #ff6600;
   margin: 4rem 0;
   position: relative;
-  overflow: visible; /* Important pentru a vedea simbolurile */
-  opacity: 1; /* Reset opacitate Bootstrap */
+  overflow: visible;
+  opacity: 1;
   /* Simbolul din STÂNGA (::before) */
 }
 hr::before {
-  content: "\f005"; /* FontAwesome Solid Star */
+  content: "\f005";
   font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
   font-weight: 900;
   position: absolute;
-  left: 20%; /* Poziționare la 20% din lungime */
+  left: 20%;
   top: 50%;
   transform: translate(-50%, -50%);
-  background-color: white; /* Acoperă linia sub simbol */
+  background-color: white;
   padding: 0 10px;
-  color: #2c3e50; /* Albastrul tău închis */
+  color: #2c3e50;
   font-size: 1.5rem;
   transition: all 0.6s ease-in-out;
 }
-hr {
-  /* Simbolul din DREAPTA (::after) */
-}
 hr::after {
-  content: "\f005"; /* FontAwesome Solid Star */
+  content: "\f005";
   font-family: "Font Awesome 6 Free", "Font Awesome 5 Free";
   font-weight: 900;
   position: absolute;
-  right: 20%; /* Poziționare la 20% de marginea din dreapta */
+  right: 20%;
   top: 50%;
   transform: translate(50%, -50%);
-  background-color: white; /* Acoperă linia sub simbol */
+  background-color: white;
   padding: 0 10px;
   color: #2c3e50;
   font-size: 1.5rem;
@@ -12248,17 +12228,17 @@ h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, label {
   position: relative;
   overflow: hidden;
   border-radius: 8px;
-  height: 250px; /* Forțăm o înălțime fixă ca să nu mai fie pozele lungi */
+  height: 250px;
 }
 
 /* Stilizare Imagini */
 .galerie-statica picture img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Face ca poza să taie marginile frumos în loc să se turtească */
+  object-fit: cover;
   display: block;
   border-radius: 8px;
-  /* Cerinta: Tranzitie de 1.25 secunde, pastrand granita de jos aliniata */
+  /* Cerinta: Tranzitie de 1.25 */
   transition: transform 1.25s ease;
   transform-origin: bottom center;
 }

@@ -1,0 +1,105 @@
+<%# --- BONUS 19: Fragment EJS Orar vizibil pe orice pagina --- %>
+<div id="orar-popup-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9998;" onclick="inchideOrar()"></div>
+<div id="orar-popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:9999; max-width:600px; width:90%; background:var(--card-bg, #fff); border:2px solid var(--accent-color, #ff6600); border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.3); padding:25px; color:var(--text-principal, #333);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3 style="margin:0;"><i class="bi bi-clock-fill"></i> Program Magazin</h3>
+        <button onclick="inchideOrar()" class="btn btn-sm btn-outline-secondary"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <table class="table table-bordered table-sm" id="tabel-orar-popup" style="margin-bottom:15px;">
+        <thead>
+            <tr style="background:var(--accent-color, #ff6600); color:white;">
+                <th>Ziua</th>
+                <th>Ridicare comenzi</th>
+                <th>Consiliere echipament</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-zi="1"><td>Luni</td><td>10:00–13:00</td><td>14:00–19:00</td></tr>
+            <tr data-zi="2"><td>Marți</td><td>10:00–13:00</td><td>14:00–19:00</td></tr>
+            <tr data-zi="3"><td>Miercuri</td><td>10:00–13:00</td><td>14:00–19:00</td></tr>
+            <tr data-zi="4"><td>Joi</td><td>10:00–13:00</td><td>14:00–19:00</td></tr>
+            <tr data-zi="5"><td>Vineri</td><td>10:00–12:00</td><td>13:00–18:00</td></tr>
+            <tr data-zi="6"><td>Sâmbătă</td><td>10:00–12:00</td><td>12:30–16:00</td></tr>
+            <tr data-zi="0"><td>Duminică</td><td colspan="2" style="text-align:center;">Închis</td></tr>
+        </tbody>
+    </table>
+    <div id="status-deschis" style="text-align:center; font-size:1.1em; font-weight:bold; padding:10px; border-radius:8px;"></div>
+</div>
+
+<button id="btn-orar-toggle" onclick="toggleOrar()" title="Vezi programul magazinului"
+    style="position:fixed; bottom:80px; right:20px; z-index:9997; width:50px; height:50px; border-radius:50%; border:2px solid var(--accent-color, #ff6600); background:var(--card-bg, #fff); color:var(--accent-color, #ff6600); font-size:1.3rem; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.2); display:flex; align-items:center; justify-content:center;">
+    <i class="bi bi-clock-fill"></i>
+</button>
+
+<script>
+function toggleOrar() {
+    let popup = document.getElementById('orar-popup');
+    let overlay = document.getElementById('orar-popup-overlay');
+    if (popup.style.display === 'none') {
+        popup.style.display = 'block';
+        overlay.style.display = 'block';
+        marcheazaZiuaCurenta();
+        // Dispare singur dupa 15 secunde
+        if (window._orarTimer) clearTimeout(window._orarTimer);
+        window._orarTimer = setTimeout(() => { inchideOrar(); }, 15000);
+    } else {
+        inchideOrar();
+    }
+}
+
+function inchideOrar() {
+    document.getElementById('orar-popup').style.display = 'none';
+    document.getElementById('orar-popup-overlay').style.display = 'none';
+    if (window._orarTimer) clearTimeout(window._orarTimer);
+}
+
+function marcheazaZiuaCurenta() {
+    let acum = new Date();
+    let ziCurenta = acum.getDay(); // 0=Duminica, 1=Luni...
+    let ora = acum.getHours();
+    let minute = acum.getMinutes();
+    let minCurente = ora * 60 + minute;
+
+    // Resetam stilurile
+    let randuri = document.querySelectorAll('#tabel-orar-popup tbody tr');
+    randuri.forEach(tr => {
+        tr.style.backgroundColor = '';
+        tr.style.fontWeight = '';
+    });
+
+    // Marcam ziua curenta
+    let randCurent = document.querySelector('#tabel-orar-popup tbody tr[data-zi="' + ziCurenta + '"]');
+    if (randCurent) {
+        randCurent.style.backgroundColor = 'var(--accent-color, #ff6600)';
+        randCurent.style.color = 'white';
+        randCurent.style.fontWeight = 'bold';
+    }
+
+    // Verificam deschis/inchis
+    let statusDiv = document.getElementById('status-deschis');
+    let esteDeschis = false;
+
+    // Orar: L-J: 10:00-19:00, V: 10:00-18:00, S: 10:00-16:00, D: inchis
+    if (ziCurenta >= 1 && ziCurenta <= 4) {
+        // Luni-Joi: 10:00-19:00
+        esteDeschis = (minCurente >= 600 && minCurente < 1140);
+    } else if (ziCurenta === 5) {
+        // Vineri: 10:00-18:00
+        esteDeschis = (minCurente >= 600 && minCurente < 1080);
+    } else if (ziCurenta === 6) {
+        // Sambata: 10:00-16:00
+        esteDeschis = (minCurente >= 600 && minCurente < 960);
+    }
+    // Duminica = inchis (esteDeschis ramane false)
+
+    if (esteDeschis) {
+        statusDiv.innerHTML = '<i class="bi bi-check-circle-fill" style="color:#28a745;"></i> <span style="color:#28a745;">DESCHIS ACUM</span>';
+        statusDiv.style.background = 'rgba(40,167,69,0.1)';
+        statusDiv.style.border = '2px solid #28a745';
+    } else {
+        statusDiv.innerHTML = '<i class="bi bi-x-circle-fill" style="color:#dc3545;"></i> <span style="color:#dc3545;">ÎNCHIS ACUM</span>';
+        statusDiv.style.background = 'rgba(220,53,69,0.1)';
+        statusDiv.style.border = '2px solid #dc3545';
+    }
+}
+</script>

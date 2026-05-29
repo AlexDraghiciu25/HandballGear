@@ -183,6 +183,20 @@
                     <p class="mt-2 fw-bold">Nu există produse conform filtrării curente.</p>
                 </div>
 
+                <%# --- BONUS 15: Numar total produse afisate --- %>
+                <div id="contor-produse" class="container text-center mb-3">
+                    <span class="badge bg-secondary" style="font-size:1em; padding:8px 16px;">
+                        <i class="bi bi-box-fill"></i> Se afișează: <span id="nr-produse-afisate">0</span> produse
+                    </span>
+                </div>
+
+                <%# --- BONUS 12: Afisare oferta curenta pe pagina de produse --- %>
+                <% if (locals.oferta && oferta) { %>
+                    <div id="oferta-produse-banner" data-categorie="<%= oferta.categorie %>" data-reducere="<%= oferta.reducere %>" class="container text-center p-3 mb-4 rounded shadow-sm" style="background: linear-gradient(135deg, #ff6600, #ff3300); color:white;">
+                        <i class="bi bi-tag-fill"></i> <strong>Ofertă activă!</strong> <span class="badge bg-light text-dark"><%= oferta.reducere %>% REDUCERE</span> la categoria <strong><%= oferta.categorie %></strong>
+                    </div>
+                <% } %>
+
 
                 <section id="grid-produse">
                     <% for (let prod of produse) { %>
@@ -212,7 +226,18 @@
                                             <i class="bi bi-trash3-fill"></i>
                                         </button>
                                     </div>
-                            </div>
+                             </div>
+
+                             <%# --- BONUS 18: Badge NOU pe pagina de produse --- %>
+                             <% 
+                                 let diffZileProd = (new Date() - new Date(prod.data_intrare)) / (1000*60*60*24);
+                                 let esteNouProd = diffZileProd <= 365;
+                             %>
+                             <% if (esteNouProd) { %>
+                                 <span class="badge-nou-produs" style="display:inline-block; background:linear-gradient(135deg,#ff6600,#ff3300); color:white; padding:3px 10px; border-radius:15px; font-weight:bold; font-size:0.75em; animation:pulse-nou-prod 1.5s infinite; margin-bottom:5px;">
+                                     <i class="bi bi-star-fill"></i> NOU
+                                 </span>
+                             <% } %>
 
                             <div class="continut-produs">
                                 <div class="col-1">
@@ -249,6 +274,13 @@
                                         <%= prod.subcategorie %>
                                     </p>
                                 </div>
+                            </div>
+
+                            <%# --- BONUS 20: Buton Compara pe fiecare produs --- %>
+                            <div class="text-end mt-2 produs-actions-bottom" onclick="event.stopPropagation()">
+                                <button class="btn btn-outline-info btn-sm btn-compara" onclick="event.stopPropagation(); adaugaLaComparare('<%= prod.id %>', this.getAttribute('data-nume'))" data-nume="<%= prod.nume %>">
+                                    <i class="bi bi-arrow-left-right"></i> <span class="d-none d-sm-inline">Compară</span>
+                                </button>
                             </div>
                         </article>
                         <% } %>
@@ -410,6 +442,41 @@
 
     .hidden-session-product {
         display: none !important;
+    }
+
+    /* Bonus 18: Animatie NOU */
+    @keyframes pulse-nou-prod {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+    }
+
+    /* Bonus 14: Cel mai ieftin */
+    .cel-mai-ieftin-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-weight: bold;
+        font-size: 0.8em;
+        animation: pulse-ieftin 2s infinite;
+        margin-top: 5px;
+    }
+    @keyframes pulse-ieftin {
+        0%, 100% { box-shadow: 0 0 5px rgba(40,167,69,0.3); }
+        50% { box-shadow: 0 0 15px rgba(40,167,69,0.6); }
+    }
+
+    /* Bonus 12: Pret redus oferta */
+    .pret-vechi-taiat {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.9em;
+    }
+    .pret-nou-oferta {
+        color: #dc3545;
+        font-weight: bold;
+        font-size: 1.1em;
     }
 </style>
 
@@ -602,6 +669,61 @@
                 mesajGol.style.display = "block";
             } else {
                 mesajGol.style.display = "none";
+            }
+
+            // --- BONUS 15: Actualizeaza numarul total de produse afisate ---
+            let contorEl = document.getElementById("nr-produse-afisate");
+            if (contorEl) contorEl.textContent = N;
+
+            // --- BONUS 14: Marcarea celui mai ieftin produs din fiecare categorie ---
+            // Stergem badge-urile anterioare
+            document.querySelectorAll('.cel-mai-ieftin-badge').forEach(b => b.remove());
+            // Gasim produsele vizibile si grupam per categorie
+            let categoriiMap = {};
+            articoleVizibile.forEach(art => {
+                let categ = art.querySelector('.categorie span').textContent.trim();
+                let pret = parseFloat(art.querySelector('.val-pret').textContent);
+                if (!categoriiMap[categ] || pret < categoriiMap[categ].pret) {
+                    categoriiMap[categ] = { art: art, pret: pret };
+                }
+            });
+            // Adaugam badge-ul pe cel mai ieftin
+            for (let categ in categoriiMap) {
+                let artIeftin = categoriiMap[categ].art;
+                // Verificam sa nu aiba deja badge
+                if (!artIeftin.querySelector('.cel-mai-ieftin-badge')) {
+                    let badge = document.createElement('div');
+                    badge.className = 'cel-mai-ieftin-badge';
+                    badge.innerHTML = '<i class="bi bi-trophy-fill"></i> Cel mai ieftin din ' + categ + '!';
+                    artIeftin.querySelector('.continut-produs').appendChild(badge);
+                }
+            }
+
+            // --- BONUS 12: Aplicare pret redus pentru produse din categoria cu oferta ---
+            // Stergem preturile anterioare de oferta
+            document.querySelectorAll('.pret-oferta-container').forEach(c => c.remove());
+            
+            let ofertaBanner = document.getElementById('oferta-produse-banner');
+            if (ofertaBanner) {
+                let ofertaCategorie = ofertaBanner.getAttribute('data-categorie');
+                let ofertaReducere = parseInt(ofertaBanner.getAttribute('data-reducere'), 10);
+                
+                articoleVizibile.forEach(art => {
+                    let categ = art.querySelector('.categorie span').textContent.trim();
+                    if (categ === ofertaCategorie) {
+                        let pretEl = art.querySelector('.val-pret');
+                        let pretOriginal = parseFloat(pretEl.textContent);
+                        let pretRedus = (pretOriginal * (1 - ofertaReducere / 100)).toFixed(2);
+                        // Adaugam container cu pret vechi taiat si pret nou
+                        let existingContainer = art.querySelector('.pret-oferta-container');
+                        if (!existingContainer) {
+                            let container = document.createElement('div');
+                            container.className = 'pret-oferta-container';
+                            container.innerHTML = '<span class="pret-vechi-taiat">' + pretOriginal + ' RON</span> <span class="pret-nou-oferta">' + pretRedus + ' RON (-' + ofertaReducere + '%)</span>';
+                            pretEl.parentElement.appendChild(container);
+                        }
+                    }
+                });
             }
         }
 
